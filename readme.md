@@ -41,7 +41,12 @@ Commit#5
 
 
 Commit#6 
-
-
 1. Learned how to animate a line from one endpoint to another
+
+
+Commit#7 - Day 5 - Midpoint Circle Drawing Algorithm
+Time taken: 55mins
+
+1. Learnt how to draw all 8 octancts of an arc therby making it a circle.
+
 
