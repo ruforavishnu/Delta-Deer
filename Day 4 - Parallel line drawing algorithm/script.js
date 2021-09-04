@@ -1,5 +1,6 @@
 
 /*
+************************************************************************
 ****Global Variables Start
 */
 let alphaPixel = [255,0,0,255] // red, green, blue and alpha transparency
@@ -20,33 +21,10 @@ class Line2D
 	
 }
 
-var line1 = new Line2D();
-line1.x1 = 10;
-line1.y1 = 10;
-line1.x2 = 300;
-line1.y2 = 300;
-
-console.log(line1);
-
-var line2 = new Line2D();
-line2.x1 = 50;
-line2.y1=50;
-line2.x2 = 150;
-line2.y2=150;
-
-console.log(line2);
-
-
-
-
-
-
-
-
-
 
 /*
 *****Global Variables End
+************************************************************************
 */
 
 /*
@@ -173,16 +151,18 @@ function drawParallelLine(x1,y1, x2,y2)
 
 function drawDynamicParallelLine(offset)
 {
+	var ourLine = linesBuffer[linesBuffer.length-1];
+	drawOffsettedParallelLine(ourLine, offset);
+}
+
+function drawOffsettedParallelLine(line, offset)/*Function for CG Library use*/
+{
 	var ourLine = new Line2D();
-	ourLine.x1 = linesBuffer[0].x1;
-	ourLine.y1 = linesBuffer[0].y1;
-	ourLine.x2 = linesBuffer[0].x2;
-	ourLine.y2 = linesBuffer[0].y2;
-	
-
-
+	ourLine.x1 = line.x1;
+	ourLine.y1 = line.y1;
+	ourLine.x2 = line.x2;
+	ourLine.y2 = line.y2;
 	drawDDALine(ourLine.x1+offset, ourLine.y1,ourLine.x2+offset,ourLine.y2);	
-
 }
 
 
@@ -200,9 +180,9 @@ function clearLastDrawnLineSegment()
 	alphaPixel[3] = backgroundColorPixel[3];
 
 	var lineToBeErased = linesBuffer[linesBuffer.length-1];
-	linesBuffer.pop()// this is the line to be eraased.
+	linesBuffer.pop()// this is the line to be erased.
 	drawDDALine(lineToBeErased.x1,lineToBeErased.y1, lineToBeErased.x2, lineToBeErased.y2);
-	linesBuffer.pop();//this is the erase-line. No need for this.(the white colorline we draw on top of the colored line)
+	linesBuffer.pop();//this is the erase-line. No need for this.(this is the white color line we draw on top of the colored line )
 
 	console.log('cleared last drawn line-segment');
 	setCurrentColor(0,0,255,255);// set line color blue
@@ -219,20 +199,14 @@ function drawScreen()
 	clearCanvas();
 	
 
-	var [x1,y1,x2,y2] = [100,100,350,350];
-	
-	
+	var [x1,y1,x2,y2] = [100,100,350,350];	
 	setCurrentColor(255,0,0,255);
-	drawDDALine(x1,y1, x2,y2);
-	
-	
+	drawDDALine(x1,y1, x2,y2);	
 
 	setCurrentColor(0,0,255,255);// set line color blue
 	drawParallelLine(x1,y1, x2, y2);
 
-	console.log('linesBuffer length:'+linesBuffer.length);
-
-
+	
 	const debugWindow = document.querySelector('#debugParagraph');
 	debugWindow.innerHTML = `x1:${x1}, y1:${y1},</br> x2:${x2}, y2:${y2}`;
 }

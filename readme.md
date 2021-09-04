@@ -22,3 +22,10 @@ Note:
 
 1. Writing parallel line algorithm
 2. Created a new class Line2D to store 2 point coordinates.
+
+
+Commit#3
+
+Note:
+1. Parallel line drawing code more optimized.
+
