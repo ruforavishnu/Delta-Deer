@@ -17,10 +17,36 @@
 		<p id="debugParagraph">Debug Window</p>
 	</span>
 </div>
-
-
+<div class="program-inputs">
+	
+	<label for="offset-range">Parallel line offset value</label>
+	<input type="range" id="offset-range" name="offset-range" min="-100" max="100" step="2">
+	
+</div>
 
 <script type="text/javascript" src="script.js"></script>
+<script>
+
+const offset = document.querySelector("#offset-range");
+
+offset.addEventListener('change', ()=> {
+
+console.log('offset value changed: '+offset.value);
+var offsetValue = parseInt(offset.value);
+console.log(typeof(offsetValue));
+
+clearLastDrawnLineSegment();
+drawDynamicParallelLine(offsetValue);
+
+console.log('linesBuffer length:'+linesBuffer.length);
+
+
+
+});
+
+</script>
+
+
 </body>
 </html>
 

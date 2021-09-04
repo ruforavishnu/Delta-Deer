@@ -8,11 +8,16 @@ Changes are written in chronological order, so latest commit details are at the 
 
 Commit#1 
 
-1. Committing all local development files to github
+Note: Committing all local development files to github
 
 Things learnt:
 1. Wrote DDA line drawing algorithm in Javascript
 2. Wrote Bresenham line drawing algorithm in Javascript
 3. Wrote Midpoint Line Drawing Algorithm in Javascript
 
+Commit#2 
 
+Note:
+
+1. Writing parallel line algorithm
+2. Created a new class Line2D to store 2 point coordinates.
