@@ -29,7 +29,7 @@ class Line2D
 
 /*
 Todo#1 - Change the alphaPixel variable to something more clear like currentPixel or similiar
-
+Todo#2 - write function to convert from world coordinates to screen coordinates 
 
 */
 
@@ -41,6 +41,11 @@ function initCanvas()
     const canvasWidth = canvas.width;
     const canvasHeight = canvas.height;
     const imageData = ctx.getImageData(0,0,1,1);
+
+
+    
+
+    
 
 }
 
@@ -116,6 +121,9 @@ function drawDDALine(x1, y1, x2, y2)
 	currentLine.y1 = y1;
 	currentLine.x2 = x2;
 	currentLine.y2 = y2;
+
+	markLineEndpoints(currentLine);
+	markLineSlope(currentLine);
 	linesBuffer.push(currentLine);
 
 
@@ -188,25 +196,66 @@ function clearLastDrawnLineSegment()
 
 }
 
+function markLineEndpoints(line)//next add line slope to this
+{
+	const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = "10px Arial";
+
+    let x = line.x1;
+    let y = line.y1;
+    let str = "("+x+","+y+")";
+    ctx.fillText(str,x,y);
+
+    x = line.x2;
+    y = line.y2;
+    str = "("+x+","+y+")";
+	ctx.fillText(str,x,y);
+
+
+}
+function markLineSlope(line)
+{
+	const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = "10px Arial";
+
+    let x = line.x2;
+    let y = line.y2;
+    let m = (line.y2-line.y1)/(line.x2-line.x1);
+
+    let str = "(m:"+m.toFixed(3)+")";
+    ctx.fillText(str,x+50,y);
+
+}
+
 function drawScreen()
 {
 	console.log('Script loaded: true');
 	initCanvas();
 	clearCanvas();
 	
-
-	var [x1,y1,x2,y2] = [100,100,350,350];	
 	setCurrentColor(255,0,0,255);
-	drawDDALine(x1,y1, x2,y2);	
+	drawDDALine(200,200, 400,200);//octet 1 horizontal line
+	drawDDALine(200,200, 400,170);//line with slope < 1
+	drawDDALine(200,200, 300,100);//line with slope = 1
+	drawDDALine(200,200, 200, 50);//vertical line
+	drawDDALine(200,200, 170, 80);//octet 3
+	drawDDALine(200,200, 100, 100);//slope = -1
+	drawDDALine(200,200, 70, 120);
+	drawDDALine(200,200, 30, 200);
+	drawDDALine(200,200, 35, 240);
+	drawDDALine(200,200, 125, 275);
+	drawDDALine(200,200, 200, 300);//downward vertical line
+	drawDDALine(200,200, 230, 280);
+	drawDDALine(200,200, 320, 320);//slope 1
+	drawDDALine(200,200, 340, 300);
+	drawDDALine(200,200, 340, 270);
 
-	setCurrentColor(0,0,255,255);// set line color blue
-	drawParallelLine(x1,y1, x2, y2);
-
-	
 
 	
 	const debugWindow = document.querySelector('#debugParagraph');
-	debugWindow.innerHTML = `x1:${x1}, y1:${y1},</br> x2:${x2}, y2:${y2}`;
+	// debugWindow.innerHTML = `x1:${x1}, y1:${y1},</br> x2:${x2}, y2:${y2}`;
 }
 
 
