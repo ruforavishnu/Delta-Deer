@@ -1,0 +1,16 @@
+canvas
+{
+	border: 1px solid black;
+}
+
+.debug-text
+{
+	border: 3px solid red;	
+	width: 400px;
+	height: 100px;
+}
+
+#debugParagraph
+{
+	padding: 10px;
+}

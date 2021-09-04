@@ -1,0 +1,88 @@
+
+
+<!DOCTYPE HTML>
+
+<html>
+   <head>
+   
+      <style>
+         #mycanvas{border:1px solid red;}
+      </style>
+   </head>
+   
+   <body id="test" ">
+      <canvas id = "mycanvas" width = "600" height = "400"></canvas>
+      <script >
+         
+            function point(x, y, canvas)
+            {
+            canvas.beginPath();
+            canvas.arc(x, y, 1, 0, 2 * Math.PI, true);
+            canvas.stroke();
+            }
+
+
+            // Get the canvas element using the DOM
+            var canvas = document.getElementById('mycanvas');
+
+            // Make sure we don't execute when canvas isn't supported
+            if (canvas.getContext) {
+               
+               // use getContext to use the canvas for drawing
+               var ctx = canvas.getContext('2d');
+               var x1 = 100;
+               var y1 = 150;
+               var x2= 50;
+               var y2 = 350;
+               
+               dx = x2-x1;
+               dy = y2-y1;
+               
+
+               console.log("dx="+dx);
+               console.log("dy="+dy);
+               
+
+               var steps = -100;
+               
+               if(Math.abs(dx) > Math.abs(dy))
+               {
+                     steps = Math.abs(dx);
+                     console.log("abs dx is greater");
+                  
+               }
+               else
+               {
+                     steps = Math.abs(dy);   
+                     console.log("abs dy  is greater");
+               }
+               
+               xIncrement = dx/steps;
+               yIncrement = dy/steps;
+               
+               console.log("xIncrement="+xIncrement);
+               console.log("yIncrement="+yIncrement);
+               console.log("steps="+steps);
+               var x = x1;
+               var y = y1;
+
+               point(x,y,ctx);
+               for(var i = 0; i < steps; i++)
+               {
+                  x = x+xIncrement;
+                  y = y+yIncrement;
+                  console.log("Math.round(x)="+Math.round(x));
+                  console.log("Math.round(y)="+Math.round(y));  
+                  point(x,y,ctx);
+                  //ctx.drawRect(1,1,Math.round(x), Math.round(y));
+               
+                
+               }
+   
+               // Draw shapes
+             //  ctx.fillRect(25,25,100,100);
+            }
+      </script>
+
+   </body>
+</html>

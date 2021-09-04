@@ -1,0 +1,64 @@
+<html>
+<head>
+<script type="text/javascript">
+ 
+function test() {
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+    var cw = canvas.width;
+    var ch = canvas.height;
+    var id = ctx.getImageData(0, 0, 1, 1);
+ 
+    ctx.clearRect(0, 0, cw, ch);
+    var t0 = new Date().getTime();
+    for (var i = 0; i < 100000; ++i) {
+        var x = Math.floor(Math.random() * cw);
+        var y = Math.floor(Math.random() * ch);
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+        // do nothing
+    }
+    var t1 = new Date().getTime();
+    console.log('random number generation: ' + (t1 - t0));
+ 
+    ctx.clearRect(0, 0, cw, ch);
+    var t0 = new Date().getTime();
+    for (var i = 0; i < 100000; ++i) {
+        var x = Math.floor(Math.random() * cw);
+        var y = Math.floor(Math.random() * ch);
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+ 
+        ctx.fillStyle = 'rgb(' + r + ',' + g + ',' + b + ')';
+        ctx.fillRect(x, y, 1, 1);
+    }
+    var t1 = new Date().getTime();
+    console.log('fillRect() method: ' + (t1 - t0));
+ 
+    ctx.clearRect(0, 0, cw, ch);
+    id.data[3] = 255;
+    var t0 = new Date().getTime();
+    for (var i = 0; i < 100000; ++i) {
+        var x = Math.floor(Math.random() * cw);
+        var y = Math.floor(Math.random() * ch);
+        var r = Math.floor(Math.random() * 256);
+        var g = Math.floor(Math.random() * 256);
+        var b = Math.floor(Math.random() * 256);
+ 
+        id.data[0] = r;
+        id.data[1] = g;
+        id.data[2] = b;
+        ctx.putImageData(id, x, y);
+    }
+    var t1 = new Date().getTime();
+    console.log('putImage() method: ' + (t1 - t0));
+}
+ 
+</script>
+</head>
+<body onload="test()">
+<canvas id="canvas" width="640" height="480">
+</body>
+</html>
