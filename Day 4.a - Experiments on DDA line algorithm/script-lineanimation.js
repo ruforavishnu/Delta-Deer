@@ -21,6 +21,11 @@ class Line2D
 	
 }
 
+var Gcanvas = document.getElementById('canvas');
+var Gctx = canvas.getContext('2d');
+var GcanvasWidth = Gcanvas.width;
+var GcanvasHeight = Gcanvas.height;
+
 
 /*
 *****Global Variables End
@@ -98,13 +103,6 @@ function plotPixelAtXY(x, y)//plots a red pixel at x,y coordinates
     
 }
 
-function plotPixelsAtXYSlowly(x,y)
-{
-	setTimeout(plotPixelAtXY,30);//pause 300ms before calling the fn again
-
-}
-
-
 
 function drawDDALine(x1, y1, x2, y2)
 {
@@ -154,16 +152,24 @@ function drawDDALineWithAnimation(x1,y1,x2,y2)
 	let x = x1;
 	let y = y1;
 
-	
-	for(var i = 0; i <= steps; i++)
+	var i = 0;
+	var timer = setInterval(function()
 	{
-		plotPixelsAtXYSlowly(Math.round(x), Math.round(y));
+		plotPixelAtXY(Math.round(x), Math.round(y));
+
 		x+=xInc;
 		y+=yInc;
-	}
+		i++;
+		console.log('plotting a pixel');
+		if(i == steps)
+		{
+			console.log('i reached value of steps.Quitting interval ');
+			clearInterval(timer);
 
+		}
+	}, 10);
 	
-
+	
 	
 	var currentLine = new Line2D();
 	currentLine.x1 = x1;
@@ -286,23 +292,9 @@ function drawScreen()
 	
 	setCurrentColor(255,0,0,255);
 
-	// drawDDALineWithAnimation(200,200,400,170);
+	// drawDDALineWithAnimation(200,200,400,200);
+	drawDDALineWithAnimation(200,200, 400,170);//line with slope < 1
 
-	drawDDALine(200,200, 400,200);//octet 1 horizontal line
-	drawDDALine(200,200, 400,170);//line with slope < 1
-	drawDDALine(200,200, 300,100);//line with slope = 1
-	drawDDALine(200,200, 200, 50);//vertical line
-	drawDDALine(200,200, 170, 80);//octet 3
-	drawDDALine(200,200, 100, 100);//slope = -1
-	drawDDALine(200,200, 70, 120);
-	drawDDALine(200,200, 30, 200);
-	drawDDALine(200,200, 35, 240);
-	drawDDALine(200,200, 125, 275);
-	drawDDALine(200,200, 200, 300);//downward vertical line
-	drawDDALine(200,200, 230, 280);
-	drawDDALine(200,200, 320, 320);//slope 1
-	drawDDALine(200,200, 340, 300);
-	drawDDALine(200,200, 340, 270);
 
 
 	

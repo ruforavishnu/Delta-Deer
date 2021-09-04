@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+285 mins
-or 405 mins
-or 6 hours 45 mins
+Time spent: 30+10+80+335 mins
+or 455 mins
+or 7 hours 35 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -38,3 +38,10 @@ Time taken:
 Commit#5
 
 1. Corrected today's time taken value in readme.md
+
+
+Commit#6 
+
+
+1. Learned how to animate a line from one endpoint to another
+
