@@ -9,6 +9,8 @@ let currentPixel = [255,0,0,255] // red, green, blue and alpha transparency
 let backgroundColorPixel = [255,255,255,255]; //white color pixel with full alpha
 let currentLineCoords = [100,100,300,300]; //random x1,y1 and x2,y2 values
 let linesBuffer = [];
+let frameBuffer = [];
+
 let curvesBuffer = [];
 let tempBuffer = [];
 let currentCurveLength = 0;
@@ -270,6 +272,12 @@ function clearLastDrawnLineSegment()
 
 function clearLastDrawnCurve()
 {
+	if(curvesBuffer.length == 0)
+	{
+		console.log('Nothing to clear, curves buffer is empty.')
+		return;
+	}
+
 	var previousPixel = [];
 	previousPixel[0] = currentPixel[0];
 	previousPixel[0] = currentPixel[0];
@@ -287,6 +295,7 @@ function clearLastDrawnCurve()
 	
 	console.log('curveToBeErased');
 	console.log(curveToBeErased);
+	
 	for(var i = 0; i < curveToBeErased.curveLength-1; i++)
 	{
 		
@@ -305,6 +314,8 @@ function clearLastDrawnCurve()
 	}
 
 	
+
+	//change current pixel color to what was previously
 	currentPixel[0] = previousPixel[0];
 	currentPixel[1] = previousPixel[1];
 	currentPixel[2] = previousPixel[2];
@@ -647,6 +658,7 @@ function drawParabola(centerX, centerY, length)
 	console.log(curvesBuffer);
 	console.log('curvesBuffer length:'+curvesBuffer.length);
 	
+	saveFrameBuffer();
 	
 	
 
@@ -770,6 +782,23 @@ function drawHyperbola(centerX, centerY, length, xParameter, yParameter)
 	}
 }
 
+function saveFrameBuffer()
+{
+	var currentFrameImageData = Gctx.getImageData(0,0, GcanvasWidth, GcanvasHeight);
+	frameBuffer.push(currentFrameImageData);
+
+
+}
+
+function replaceWithPreviousFrameBuffer()
+{
+	var imageData = frameBuffer[frameBuffer.length-1];
+	clearCanvas();
+	console.log('imageData');
+	console.log(imageData);
+
+}
+
 
 function drawScreen()
 {
@@ -783,7 +812,10 @@ function drawScreen()
 	var point = {x:250, y:150}
 	markPoint(point);
 	drawParabola(point.x,point.y,20);
+	setCurrentColor(0,255,0,255);	//green
 	
+	drawDDALine(0,300, 500,300);
+	setCurrentColor(255,0,0,255);//red
 	// setCurrentColor(0,255,0,255);	
 	drawParabola(350,100,20);//try with different length also
 	drawParabola(350,180,18);//try with different length also

@@ -65,4 +65,9 @@ Commit#10 - Code for Previous parabola erase figured out and written
 1. Wrote code to erase the previous curve one by one. Works only for parabola now, need to extend it to all curves later.
 
 
+Commit#11
+
+1. Writing code to save frameBuffer when objects are drawn and saving it to a list 
+2. And when needed, write the values of the frameBuffer onto screen. Means writing the entire frame to canvas.
+
 
