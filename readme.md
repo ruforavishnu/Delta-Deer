@@ -50,3 +50,8 @@ Time taken: 55mins
 1. Learnt how to draw all 8 octancts of an arc therby making it a circle.
 
 
+Commit#8 - Day 6 - Midpoint Ellipse Drawing Algorithm
+Time taken: 30 mins
+1. Learnt how to draw an ellipse with both major axis and minor axis.
+
+
