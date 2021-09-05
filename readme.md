@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335 mins
-or 455 mins
-or 7 hours 35 mins
+Time spent: 30+10+80+335+360 mins
+or 815 mins
+or 13 hours 35 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -53,5 +53,13 @@ Time taken: 55mins
 Commit#8 - Day 6 - Midpoint Ellipse Drawing Algorithm
 Time taken: 30 mins
 1. Learnt how to draw an ellipse with both major axis and minor axis.
+
+
+Commit#9 - Day 7 - Draw Parabola && Day 8 - Draw Hyperbola completed
+1. Learnt how to plot a parabola
+2. Learnt how to plot an advanced parabola with parameters a and b ( b.y = a.x² format )
+3. Learnt how to plot a hyperbola
+
+
 
 

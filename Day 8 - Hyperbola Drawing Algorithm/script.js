@@ -36,8 +36,17 @@ var GcanvasHeight = Gcanvas.height;
 
 /*
 Todo#1 - Change the alphaPixel variable to something more clear like currentPixel or similiar
-Todo#2 - write function to convert from world coordinates to screen coordinates 
-Todo#3- test time taken for drawing DDA line
+Todo#2 - write function to convert from world coordinates to screen coordinates -COMPLETED
+Todo#3- test time taken for drawing DDA line - COMPLETED
+Todo#4 - write DDA line algorithm to check whether to mark endpoints by using an extra parameter markEndpoints=true
+Todo#5 - Instead of performing Math.sqrt at runtime, create a super long array filled with values 
+of the square roots. for example if you want to find sqrt of 85.37 instead of performing the square root 
+operation, before beginning the program itself create a huge array/table of data of all the square roots of 
+all numbers from 1-1000 before hand. And if you need to find the square root, just access that particular
+value from the array. So instead of performing Math.sqrt you can read the value from the array.
+Just make sure for each value example 15.03 and 15.04 and 15.0x till 15.98 and 15.99 till 16.00 are calculated before hand
+in the array.
+
 */
 
 
@@ -133,8 +142,8 @@ function drawDDALine(x1, y1, x2, y2)
 	currentLine.x2 = x2;
 	currentLine.y2 = y2;
 
-	markLineEndpoints(currentLine);
-	markLineSlope(currentLine);
+	//markLineEndpoints(currentLine);
+	//markLineSlope(currentLine);
 	linesBuffer.push(currentLine);
 
 }
@@ -271,6 +280,22 @@ function markLineEndpoints(line)//next add line slope to this
 
 
 }
+
+function markPoint(point)
+{
+	const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = "10px Arial";
+
+
+    let x = point.x;
+    let y = point.y;
+    plotPixelAtXY(x,y);
+    let str = "("+x+","+y+")";
+    ctx.fillText(str,x,y);
+
+
+}
 function markLineSlope(line)
 {
 	const canvas = document.getElementById('canvas');
@@ -392,6 +417,273 @@ function drawMidpointEllipse(centerX, centerY, xRadius, yRadius)
 		}
 	}
 }
+function drawAdvancedParabola(centerX, centerY, length, xParameter, yParameter)
+{
+	//our better parabola eqn with parameters is by = ax² so plot it
+
+	x = centerX;
+	y = centerY;
+	var pointsBuffer = [];
+	var myPoint = { x:0, y:0 };
+	var a = xParameter;
+	var b = yParameter;
+
+
+	
+	
+
+	
+
+	//draw points on the right half of the parabola
+	for(var i = 0; i < length; i++)
+	{
+		var x = i;
+		var y = i*i;
+
+		y = (a * (x*x))/b;
+
+		myPoint.x = x;
+		myPoint.y = y;
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX+myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+		
+	}
+
+	//connect all points on the parabola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+
+	}
+
+	//draw points on the left half of the parabola
+	pointsBuffer = [];
+
+	for(var i = 0; i < length; i++)
+	{
+			
+		var x = i;
+		var y = i*i;
+
+		y = (a * (x*x))/b;
+
+		myPoint.x = x;
+		myPoint.y = y;
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX-myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+
+	}
+
+	
+	//connect all points on the parabola with a line
+	
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+	}
+	
+
+
+}
+
+function drawParabola(centerX, centerY, length)
+{
+	x = centerX;
+	y = centerY;
+	var pointsBuffer = [];
+	var myPoint = { x:0, y:0 };
+	
+	//our parabola eqn is y = x² so plot it
+
+	
+
+	//draw points on the right half of the parabola
+	for(var i = 0; i < length; i++)
+	{
+		
+		myPoint.x = i;
+		myPoint.y = (i*i);
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX+myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+		
+	}
+
+	//connect all points on the parabola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+
+	}
+
+	//draw points on the left half of the parabola
+	pointsBuffer = [];
+
+	for(var i = 0; i < length; i++)
+	{
+			
+		myPoint.x = i;
+		myPoint.y = (i*i);
+
+		var reqdPoint = { x: 0, y: 0};
+		
+		reqdPoint.x = centerX-myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);		
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+
+	}
+
+	
+	//connect all points on the parabola with a line
+	
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+	}
+	
+
+}
+
+function drawHyperbola(centerX, centerY, length, xParameter, yParameter)
+{
+	//Equation of hyperbola is Hyperbola: x²/a² - y²/b² = 1 
+
+	//our better parabola eqn with parameters is by = ax² so plot it
+
+	var pointsBuffer = [];
+	var myPoint = { x:0, y:0 };
+	var a = xParameter;
+	var b = yParameter;
+	
+	//draw points on the right half of the hyperbola
+	for(var i = 0; i < length; i++)
+	{
+		
+		var x = i;		
+		var y = Math.sqrt( (b*b)*(1 +  (x*x)/(a*a) ) ) ;
+		
+		myPoint.x = x;
+		myPoint.y = y;
+		
+		var reqdPoint = { x: 0, y: 0};
+		if(xParameter < 0 && yParameter >= 0)//x is negative. y is positive
+		{
+			reqdPoint.x = centerX-myPoint.x;
+			reqdPoint.y = centerY+myPoint.y;
+		}
+		else if(xParameter >=0 && yParameter < 0)// x is positive. y is negative
+		{
+			reqdPoint.x = centerX+myPoint.x;
+			reqdPoint.y = centerY-myPoint.y;	
+		}
+		else if(xParameter >= 0 && yParameter >= 0)//x is positive. y is positive
+		{
+			reqdPoint.x = centerX+myPoint.x;
+			reqdPoint.y = centerY+myPoint.y;	
+		}
+		else if(xParameter < 0 && yParameter < 0)// x is negative. y is negative
+		{
+			reqdPoint.x = centerX-myPoint.x;
+			reqdPoint.y = centerY-myPoint.y;		
+		}
+		
+		reqdPoint.x = parseFloat(reqdPoint.x.toFixed(3));
+		reqdPoint.y = parseFloat(reqdPoint.y.toFixed(3));
+		
+		if(Number.isNaN(reqdPoint.x) || Number.isNaN(reqdPoint.y) )
+			break;
+
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);//plot the calculated hyperbola pixel 
+
+		
+	}
+	//connect all points on the hyperbola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+
+	}
+	
+	// draw points on the left half of the hyperbola
+	pointsBuffer = [];
+	for(var i = 0; i < length; i++)
+	{
+		
+		var x = i;
+		var y = Math.sqrt( (b*b)*(1 + (x*x)/(a*a) ) ) ;
+
+		myPoint.x = x;
+		myPoint.y = y;
+				
+		var reqdPoint = { x: 0, y: 0};
+		if(xParameter < 0 && yParameter >= 0)//x is negative. y is positive
+		{
+			reqdPoint.x = centerX+myPoint.x;
+			reqdPoint.y = centerY+myPoint.y;
+		}
+		else if(xParameter >=0 && yParameter < 0)// x is positive. y is negative
+		{
+			reqdPoint.x = centerX-myPoint.x;
+			reqdPoint.y = centerY-myPoint.y;	
+		}
+		else if(xParameter >= 0 && yParameter >= 0)//x is positive. y is positive
+		{
+			reqdPoint.x = centerX-myPoint.x;
+			reqdPoint.y = centerY+myPoint.y;	
+		}
+		else if(xParameter < 0 && yParameter < 0)// x is negative. y is negative
+		{
+			reqdPoint.x = centerX+myPoint.x;
+			reqdPoint.y = centerY-myPoint.y;		
+		}
+		
+		
+		reqdPoint.x = parseFloat(reqdPoint.x.toFixed(3));
+		reqdPoint.y = parseFloat(reqdPoint.y.toFixed(3));
+		
+		if(Number.isNaN(reqdPoint.x) || Number.isNaN(reqdPoint.y) )
+			continue;
+		
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);//plot the pixel on the mirror side of the hyperbola
+	
+	}
+	
+	//connect all points on the hyperbola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+	}
+}
+
 
 function drawScreen()
 {
@@ -401,38 +693,25 @@ function drawScreen()
 	
 	setCurrentColor(255,0,0,255);
 
-	
-
-	var t1 = Date.now();
-	drawDDALine(200,200, 400,170);//line with slope < 1
 	var t2 = Date.now();
 
-	var elapsedTime = t2-t1;
-	console.log('Time taken for drawing line :'+elapsedTime+' milliseconds');
+	setCurrentColor(255,0,0,255);
 
-	setCurrentColor(200,0,255,255);
-	
-	drawMidpointEllipse(350,150, 100,50);
-	drawMidpointEllipse(50,250, 200,77);
-	drawMidpointEllipse(238,221, 10,177);
-	drawMidpointEllipse(218,241, 210,34);
-	drawMidpointEllipse(218,241, 210,340);
-	drawMidpointEllipse(200,200, 50,150);
+	var xParameter = 30;
+	var yParameter = 30;
+	var point = {x:250, y:150}
+
+	markPoint(point);
+	// drawHyperbola(250,150,200,-30,30);
+	drawHyperbola(150,150,200,xParameter*1,yParameter*1);
+	drawHyperbola(400,150,200,-1*xParameter,yParameter*1);
+	drawHyperbola(150,150,200,xParameter*1,-1*yParameter);//this one
+	drawHyperbola(400,150,200,-1*xParameter,-1*yParameter);
+
 	
 	var t3 = Date.now();
 	elapsedTime = t3-t2;
 	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
-
-	var myPoint = { x:350, y:100 };
-	console.log('the orginal point:');
-	console.log(myPoint);
-	var newPoint = ConversionLibrary.orthogonalToScreenCoords(myPoint);
-	console.log('the converted to screen point:');
-	console.log(newPoint);
-
-
-
-
 
 	
 	const debugWindow = document.querySelector('#debugParagraph');

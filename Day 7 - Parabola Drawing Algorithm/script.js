@@ -38,6 +38,7 @@ var GcanvasHeight = Gcanvas.height;
 Todo#1 - Change the alphaPixel variable to something more clear like currentPixel or similiar
 Todo#2 - write function to convert from world coordinates to screen coordinates 
 Todo#3- test time taken for drawing DDA line
+Todo#4 - write DDA line algorithm to check whether to mark endpoints by using an extra parameter markEndpoints=true
 */
 
 
@@ -133,8 +134,8 @@ function drawDDALine(x1, y1, x2, y2)
 	currentLine.x2 = x2;
 	currentLine.y2 = y2;
 
-	markLineEndpoints(currentLine);
-	markLineSlope(currentLine);
+	//markLineEndpoints(currentLine);
+	//markLineSlope(currentLine);
 	linesBuffer.push(currentLine);
 
 }
@@ -392,6 +393,154 @@ function drawMidpointEllipse(centerX, centerY, xRadius, yRadius)
 		}
 	}
 }
+function drawAdvancedParabola(centerX, centerY, length, xParameter, yParameter)
+{
+	//our better parabola eqn with parameters is by = ax² so plot it
+
+	x = centerX;
+	y = centerY;
+	var pointsBuffer = [];
+	var myPoint = { x:0, y:0 };
+	var a = xParameter;
+	var b = yParameter;
+
+
+	
+	
+
+	
+
+	//draw points on the right half of the parabola
+	for(var i = 0; i < length; i++)
+	{
+		var x = i;
+		var y = i*i;
+
+		y = (a * (x*x))/b;
+
+		myPoint.x = x;
+		myPoint.y = y;
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX+myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+		
+	}
+
+	//connect all points on the parabola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+
+	}
+
+	//draw points on the left half of the parabola
+	pointsBuffer = [];
+
+	for(var i = 0; i < length; i++)
+	{
+			
+		var x = i;
+		var y = i*i;
+
+		y = (a * (x*x))/b;
+
+		myPoint.x = x;
+		myPoint.y = y;
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX-myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+
+	}
+
+	
+	//connect all points on the parabola with a line
+	
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+	}
+	
+
+
+}
+
+function drawParabola(centerX, centerY, length)
+{
+	x = centerX;
+	y = centerY;
+	var pointsBuffer = [];
+	var myPoint = { x:0, y:0 };
+	
+	//our parabola eqn is y = x² so plot it
+
+	
+
+	//draw points on the right half of the parabola
+	for(var i = 0; i < length; i++)
+	{
+		
+		myPoint.x = i;
+		myPoint.y = (i*i);
+
+		var reqdPoint = { x: 0, y: 0};
+		reqdPoint.x = centerX+myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+		
+	}
+
+	//connect all points on the parabola with a line
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+
+	}
+
+	//draw points on the left half of the parabola
+	pointsBuffer = [];
+
+	for(var i = 0; i < length; i++)
+	{
+			
+		myPoint.x = i;
+		myPoint.y = (i*i);
+
+		var reqdPoint = { x: 0, y: 0};
+		
+		reqdPoint.x = centerX-myPoint.x;;
+		reqdPoint.y = centerY+myPoint.y;
+		pointsBuffer.push(reqdPoint);		
+		plotPixelAtXY(reqdPoint.x, reqdPoint.y);
+
+	}
+
+	
+	//connect all points on the parabola with a line
+	
+	for(var i = 0; i < pointsBuffer.length-1; i++)
+	{
+		var currentPoint = pointsBuffer[i];
+		var nextPoint = pointsBuffer[i+1];
+		drawDDALine(currentPoint.x,currentPoint.y, nextPoint.x, nextPoint.y);
+	}
+	
+
+}
 
 function drawScreen()
 {
@@ -410,25 +559,17 @@ function drawScreen()
 	var elapsedTime = t2-t1;
 	console.log('Time taken for drawing line :'+elapsedTime+' milliseconds');
 
-	setCurrentColor(200,0,255,255);
 	
-	drawMidpointEllipse(350,150, 100,50);
-	drawMidpointEllipse(50,250, 200,77);
-	drawMidpointEllipse(238,221, 10,177);
-	drawMidpointEllipse(218,241, 210,34);
-	drawMidpointEllipse(218,241, 210,340);
-	drawMidpointEllipse(200,200, 50,150);
+	
+	setCurrentColor(255,0,0,255);
+	drawAdvancedParabola(250,250,45, 2,30);
+	drawAdvancedParabola(350,250,300,2,1000);
 	
 	var t3 = Date.now();
 	elapsedTime = t3-t2;
 	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
 
-	var myPoint = { x:350, y:100 };
-	console.log('the orginal point:');
-	console.log(myPoint);
-	var newPoint = ConversionLibrary.orthogonalToScreenCoords(myPoint);
-	console.log('the converted to screen point:');
-	console.log(newPoint);
+	
 
 
 
