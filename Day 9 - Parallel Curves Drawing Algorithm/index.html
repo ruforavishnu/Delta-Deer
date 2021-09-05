@@ -1,0 +1,53 @@
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<link rel="stylesheet" href="style.css">
+	<title> Day 9 - Parallel Curves Drawing Algorithm </title>
+</head>
+<body>
+
+<h3>Day 9 - Parallel Curves Drawing Algorithm</h3>
+
+<canvas id="canvas" width="600" height="400"></canvas>
+<div class="program-inputs">
+	
+	<label for="parabola-offset-range">Parallel parabola offset value</label>
+	<input type="range" id="parabola-offset-range" name="parabola-offset-range" min="-100" max="100" step="2">
+	
+</div>
+
+<div class="debug-text">
+	<span>
+		<p id="debugParagraph">Debug Window</p>
+	</span>
+</div>
+<script type="text/javascript" src="../libraries/ConversionLibrary.js"></script>
+<script type="text/javascript" src="script.js"></script>
+
+<script>
+
+const parabola_offset = document.querySelector("#parabola-offset-range");
+
+parabola_offset.addEventListener('change', ()=> {
+
+console.log('parabola offset value changed: '+parabola_offset.value);
+
+var offsetValue = parseInt(parabola_offset.value);
+clearLastDrawnCurve();
+
+
+// clearLastDrawnLineSegment();
+// drawDynamicParallelLine(offsetValue);
+
+
+
+
+
+});
+
+</script>
+</body>
+</html>
+

@@ -60,6 +60,9 @@ Commit#9 - Day 7 - Draw Parabola && Day 8 - Draw Hyperbola completed
 2. Learnt how to plot an advanced parabola with parameters a and b ( b.y = a.x² format )
 3. Learnt how to plot a hyperbola
 
+Commit#10 - Code for Previous parabola erase figured out and written
+
+1. Wrote code to erase the previous curve one by one. Works only for parabola now, need to extend it to all curves later.
 
 
 
