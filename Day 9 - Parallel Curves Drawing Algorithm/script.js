@@ -790,12 +790,32 @@ function saveFrameBuffer()
 
 }
 
-function replaceWithPreviousFrameBuffer()
+function replaceWithPreviousFrameBuffer()//idea:find only the pixels which changed and then write only them onto the canvas. that would be super optimized.
 {
-	var imageData = frameBuffer[frameBuffer.length-1];
+	var inImageData = frameBuffer[frameBuffer.length-1];
 	clearCanvas();
-	console.log('imageData');
-	console.log(imageData);
+	console.log('inImageData');
+	console.log(inImageData);
+
+	var thisPixel = [];
+	var totalPixels = inImageData.width * inImageData.height * 4;//since each pixel has 4 bits of color data
+
+	//todo: to calculate the x,y coord of the canvas to draw the pixel
+
+	for(var i = 0; i < totalPixels; i++)
+	{	
+		thisPixel[0] = imageData.data[i];//red
+		thisPixel[1] = imageData.data[i+1];//green
+		thisPixel[2] = imageData.data[i+2];//blue
+		thisPixel[3] = imageData.data[i+3];//alpha
+
+		if(i%4 == 0)//its the point where the red bit of the pixel is starting.
+		{
+			//TODO: calculate the x,y coords using  imageData, width, height and variable i values.
+			Gctx.putImageData(thisPixel, screenX, screenY );
+		}
+		
+	}
 
 }
 
