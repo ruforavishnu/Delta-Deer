@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10 mins
-or 945 mins
-or 15 hours 45 mins
+Time spent: 30+10+80+335+480+10+30 mins
+or 975 mins
+or 16 hours 15 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -78,3 +78,9 @@ Commit#13
 Time spent: 10 mins
 1. Figuring out how to draw the saved buffer back on screen.
 
+
+Commit#14
+Time spent : 30 mins
+
+1. Figured out how to paint to canvas
+2. Also, figuring out erase canvas to just previous frame from framebuffer.

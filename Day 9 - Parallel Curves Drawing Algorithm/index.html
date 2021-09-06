@@ -15,6 +15,7 @@
 	
 	<label for="parabola-offset-range">Parallel parabola offset value</label>
 	<input type="range" id="parabola-offset-range" name="parabola-offset-range" min="-100" max="100" step="2">
+	<button class="resetButton" name="resetButton" id="resetButton">Reset</button>
 	
 </div>
 
@@ -29,22 +30,19 @@
 <script>
 
 const parabola_offset = document.querySelector("#parabola-offset-range");
+const reset_button = document.querySelector('#resetButton');
 
-parabola_offset.addEventListener('change', ()=> {
+parabola_offset.addEventListener('change', ()=> 
+{
+	console.log('parabola offset value changed: '+parabola_offset.value);
+	var offsetValue = parseInt(parabola_offset.value);
+	
+});
 
-console.log('parabola offset value changed: '+parabola_offset.value);
+reset_button.addEventListener('click', function(){
 
-var offsetValue = parseInt(parabola_offset.value);
-//clearLastDrawnCurve();
 
 replaceWithPreviousFrameBuffer();
-
-
-// clearLastDrawnLineSegment();
-// drawDynamicParallelLine(offsetValue);
-
-
-
 
 
 });

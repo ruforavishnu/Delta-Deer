@@ -179,10 +179,10 @@ function drawDDALineWithAnimation(x1,y1,x2,y2)
 		x+=xInc;
 		y+=yInc;
 		i++;
-		console.log('plotting a pixel');
+		// console.log('plotting a pixel');
 		if(i == steps)
 		{
-			console.log('i reached value of steps.Quitting interval ');
+			// console.log('i reached value of steps.Quitting interval ');
 			clearInterval(timer);
 
 		}
@@ -569,6 +569,11 @@ function drawAdvancedParabola(centerX, centerY, length, xParameter, yParameter)
 
 function drawParabola(centerX, centerY, length)
 {
+
+	console.count('invoked saveFrameBuffer fn');
+	saveFrameBuffer();
+	
+	console.count('invoked parabola fn');
 	x = centerX;
 	y = centerY;
 	var pointsBuffer = [];
@@ -608,8 +613,6 @@ function drawParabola(centerX, centerY, length)
 	//draw points on the left half of the parabola
 	tempBuffer = [...tempBuffer,...pointsBuffer];//sperad out all values in pointbuffer to tempbuffer
 	firstBuffer = [...firstBuffer,...pointsBuffer];
-	console.log('pointsBuffer 1:');
-	console.log(pointsBuffer);
 	
 
 	pointsBuffer = [];//clear the points buffer
@@ -654,11 +657,8 @@ function drawParabola(centerX, centerY, length)
 
 	curvesBuffer.push(currentCurve);
 	
-	console.log('curvesBuffer');
-	console.log(curvesBuffer);
-	console.log('curvesBuffer length:'+curvesBuffer.length);
 	
-	saveFrameBuffer();
+	
 	
 	
 
@@ -786,37 +786,26 @@ function saveFrameBuffer()
 {
 	var currentFrameImageData = Gctx.getImageData(0,0, GcanvasWidth, GcanvasHeight);
 	frameBuffer.push(currentFrameImageData);
+	console.log('saved frame to buffer. Now framebuffer length is:'+frameBuffer.length);
 
 
 }
 
 function replaceWithPreviousFrameBuffer()//idea:find only the pixels which changed and then write only them onto the canvas. that would be super optimized.
 {
-	var inImageData = frameBuffer[frameBuffer.length-1];
-	clearCanvas();
-	console.log('inImageData');
-	console.log(inImageData);
+	console.log('Entered replaceframebuffer method. Now framebuffer length is:'+frameBuffer.length);
+	
+	
 
-	var thisPixel = [];
-	var totalPixels = inImageData.width * inImageData.height * 4;//since each pixel has 4 bits of color data
+	
+	var index = frameBuffer.length - 1;
+	inImageData = frameBuffer[index];
 
-	//todo: to calculate the x,y coord of the canvas to draw the pixel
-
-	for(var i = 0; i < totalPixels; i++)
-	{	
-		thisPixel[0] = imageData.data[i];//red
-		thisPixel[1] = imageData.data[i+1];//green
-		thisPixel[2] = imageData.data[i+2];//blue
-		thisPixel[3] = imageData.data[i+3];//alpha
-
-		if(i%4 == 0)//its the point where the red bit of the pixel is starting.
-		{
-			//TODO: calculate the x,y coords using  imageData, width, height and variable i values.
-			Gctx.putImageData(thisPixel, screenX, screenY );
-		}
-		
-	}
-
+	if(inImageData)
+		Gctx.putImageData(inImageData,0,0);
+	frameBuffer.pop();
+	console.log('exiting replaceFrambuffer(). replaced frame to buffer. Now framebuffer length is:'+frameBuffer.length);
+	
 }
 
 
@@ -825,16 +814,19 @@ function drawScreen()
 	console.log('Script loaded: true');
 	initCanvas();
 	clearCanvas();
+	saveFrameBuffer();
 	
 	var t2 = Date.now();
 	setCurrentColor(255,0,0,255);	
 	
 	var point = {x:250, y:150}
 	markPoint(point);
+	saveFrameBuffer();
 	drawParabola(point.x,point.y,20);
 	setCurrentColor(0,255,0,255);	//green
-	
+	saveFrameBuffer();
 	drawDDALine(0,300, 500,300);
+	saveFrameBuffer();
 	setCurrentColor(255,0,0,255);//red
 	// setCurrentColor(0,255,0,255);	
 	drawParabola(350,100,20);//try with different length also
