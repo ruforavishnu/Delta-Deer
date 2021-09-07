@@ -36,6 +36,7 @@ parabola_offset.addEventListener('change', ()=>
 {
 	console.log('parabola offset value changed: '+parabola_offset.value);
 	var offsetValue = parseInt(parabola_offset.value);
+	drawDynamicParabola(offsetValue);
 	
 });
 

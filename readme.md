@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30 mins
-or 975 mins
-or 16 hours 15 mins
+Time spent: 30+10+80+335+480+10+30+30 mins
+or 1075 mins
+or 16 hours 45 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -84,3 +84,10 @@ Time spent : 30 mins
 
 1. Figured out how to paint to canvas
 2. Also, figuring out erase canvas to just previous frame from framebuffer.
+
+
+Commit#15
+Time spent: 30mins
+1. Parallel curve drawing algorithm for Parabola figured out and coded. Next need to write for advanced parabola, hyperbola. It might seem difficult figuring out these pixel tasks, but will immensely help you once you start making libraries out of the code you are writing now.
+
+

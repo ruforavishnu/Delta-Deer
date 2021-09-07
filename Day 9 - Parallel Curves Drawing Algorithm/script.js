@@ -10,6 +10,7 @@ let backgroundColorPixel = [255,255,255,255]; //white color pixel with full alph
 let currentLineCoords = [100,100,300,300]; //random x1,y1 and x2,y2 values
 let linesBuffer = [];
 let frameBuffer = [];
+let parabolaBuffer = [];
 
 let curvesBuffer = [];
 let tempBuffer = [];
@@ -28,6 +29,16 @@ class Line2D
 		this.y2 = y2;
 	}
 	
+}
+
+class Parabola2D
+{
+	constructor(x,y, length)
+	{
+		this.x = x;
+		this.y = y;
+		this.length = length;
+	}
 }
 
 var Gcanvas = document.getElementById('canvas');
@@ -241,6 +252,26 @@ function drawOffsettedParallelLine(line, offset)/*Function for CG Library use*/
 	ourLine.x2 = line.x2;
 	ourLine.y2 = line.y2;
 	drawDDALine(ourLine.x1+offset, ourLine.y1,ourLine.x2+offset,ourLine.y2);	
+}
+
+function drawDynamicParabola(offset)
+{
+	var ourParabola = parabolaBuffer[parabolaBuffer.length-1];//get last drawn Parabola
+	drawOffsettedParabola(ourParabola, offset);
+
+}
+
+
+
+function drawOffsettedParabola(parabola, offset)
+{
+	
+	clearCanvas();
+	setCurrentColor(255,0,0,255);//set to red
+	var initialParabola = parabolaBuffer[0];
+	drawParabola(initialParabola.x, initialParabola.y, initialParabola.length);
+	setCurrentColor(0,0,255,255);//set back to blue
+	drawParabola(initialParabola.x+offset, initialParabola.y, initialParabola.length);
 }
 
 
@@ -570,10 +601,10 @@ function drawAdvancedParabola(centerX, centerY, length, xParameter, yParameter)
 function drawParabola(centerX, centerY, length)
 {
 
-	console.count('invoked saveFrameBuffer fn');
+	
 	saveFrameBuffer();
 	
-	console.count('invoked parabola fn');
+	
 	x = centerX;
 	y = centerY;
 	var pointsBuffer = [];
@@ -656,6 +687,14 @@ function drawParabola(centerX, centerY, length)
 
 
 	curvesBuffer.push(currentCurve);
+
+
+	var ourParabola = new Parabola2D();
+	ourParabola.x = centerX;
+	ourParabola.y = centerY;
+	ourParabola.length = length;
+
+	parabolaBuffer.push(ourParabola);
 	
 	
 	
@@ -791,6 +830,7 @@ function saveFrameBuffer()
 
 }
 
+
 function replaceWithPreviousFrameBuffer()//idea:find only the pixels which changed and then write only them onto the canvas. that would be super optimized.
 {
 	console.log('Entered replaceframebuffer method. Now framebuffer length is:'+frameBuffer.length);
@@ -814,23 +854,24 @@ function drawScreen()
 	console.log('Script loaded: true');
 	initCanvas();
 	clearCanvas();
-	saveFrameBuffer();
+	// saveFrameBuffer();
 	
 	var t2 = Date.now();
 	setCurrentColor(255,0,0,255);	
 	
 	var point = {x:250, y:150}
 	markPoint(point);
-	saveFrameBuffer();
+	// saveFrameBuffer();
 	drawParabola(point.x,point.y,20);
-	setCurrentColor(0,255,0,255);	//green
-	saveFrameBuffer();
-	drawDDALine(0,300, 500,300);
-	saveFrameBuffer();
-	setCurrentColor(255,0,0,255);//red
-	// setCurrentColor(0,255,0,255);	
-	drawParabola(350,100,20);//try with different length also
-	drawParabola(350,180,18);//try with different length also
+
+	// setCurrentColor(0,255,0,255);	//green
+	// saveFrameBuffer();
+	// drawDDALine(0,300, 500,300);
+	// saveFrameBuffer();
+	// setCurrentColor(255,0,0,255);//red
+	// // setCurrentColor(0,255,0,255);	
+	// drawParabola(350,100,20);//try with different length also
+	// drawParabola(350,180,18);//try with different length also
 	
 	var t3 = Date.now();
 	elapsedTime = t3-t2;
