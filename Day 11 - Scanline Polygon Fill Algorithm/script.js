@@ -54,12 +54,16 @@ class Point2D
 
 class Edge2D 
 {        
-    constructor(yUpper,xIntersect, dxPerScan, nextEdge)
+    constructor(startPoint, endPoint, yUpper,intercepts, scanSteps, nextEdge, slanting)
     {
+        this.startPoint = startPoint;
+        this.endPoint = endPoint;
+        
         this.yUpper = yUpper;
-        this.xIntersect = xIntersect;
-        this.dxPerScan = dxPerScan;
+        this.intercepts = intercepts;
+        this.scanSteps = scanSteps;
         this.nextEdge = nextEdge;
+        this.slanting = slanting;
     }
 }
 
@@ -958,30 +962,143 @@ function scanlinePolygonFillAlgorithm(polyObject)
         //now mark these points as A,B,C.. etc        
         markPointAs(points[i], nodeNames[i]);
     }
-    
-    
-    var myIntercepts = findAllInterceptsOfEdge(points[0], points[1]);//pass 2 points as a line segment and finds/returns all the intercepts on that linesegment
-    
-    console.log({myIntercepts});
-    var myColor = getCurrentColor();
-    setCurrentColor(0,150,0,255);
-    var edge1 = myIntercepts[0];
-    var edge2 = myIntercepts[1];
-    for(var i = 0; i < myIntercepts.length; i++)
-    {
-        if(i%5==0)
-        {
-            var point = myIntercepts[i];            
-            drawMidpointCircle(point.x, point.y, 2);
-        }      
-        
-    }
-    setCurrentColor(myColor);//revert color to previous
-    
-    var myEdge = findAllInterceptsOfEdge(points[0], points[1]);
-    
-    
    
+    
+    var edge1 = new Edge2D();
+    edge1.startPoint = points[0];
+    edge1.endPoint = points[1];
+
+
+    populateEdgeProperties(edge1);
+    
+    var edge2 = new Edge2D();
+    edge2.startPoint = points[1];
+    edge2.endPoint = points[2];
+    
+    edge1.nextEdge = edge2;
+    
+    console.log('edge1:');
+    console.log({edge1});
+    var edgeList = [];
+    
+    //populate all edges from n=0 to n-1
+    for(var i = 0; i < polyLength-1; i++)
+    {
+        var edge = new Edge2D();
+        edge.startPoint = points[i];
+        edge.endPoint = points[i+1]
+        populateEdgeProperties(edge);
+        edgeList.push(edge);
+    }
+    
+    //now populate the final edge 
+    var edge = new Edge2D();
+    edge.startPoint = points[points.length-1];
+    edge.endPoint = points[0];
+    populateEdgeProperties(edge);
+    edgeList.push(edge);
+    
+    //finally, assign the nextEdge value of Edge2D object
+    for(var i = 0; i< edgeList.length-1; i++)
+    {
+        edgeList[i].nextEdge = edgeList[i+1];
+    }
+    edgeList[edgeList.length-1].nextEdge = edgeList[0];
+    
+    console.log('edgeList:');
+    console.log({edgeList});
+    
+    for(var i = 0; i < edgeList.length; i++)
+    {
+        var endPoint = edgeList[i].endPoint;
+        drawMidpointCircle(endPoint.x, endPoint.y, 5);
+    }
+    
+    
+    
+    
+    
+    
+    
+
+
+    //var myEdge = findAllInterceptsOfEdge(points[0], points[1]);
+    
+}
+
+function populateEdgeProperties(edge)
+{
+    var startX = edge.startPoint.x;
+    var startY = edge.startPoint.y;
+    var endX = edge.endPoint.x;
+    var endY = edge.endPoint.y;
+    
+    var dx = endX - startX;
+    var dy = endY - startY;
+    
+     //next find m (slope) of the line
+    var m = dy/dx;
+    var steps = 0;
+    if(startY > endY)
+        edge.yUpper = endY;
+    else
+        edge.yUpper = startY;
+    
+    var intercepts = [];   
+    
+    
+    //choose the longest as the parameter for stepping one by one
+    if(Math.abs(dy) > Math.abs(dx))
+    {
+        steps = dy;
+        console.log('vertical length is bigger than horizontal');
+        outputToDebugWindow('vertical bigger');
+        var point = new Point2D();
+        point.x = startX;
+        point.y = startY;
+        intercepts.push(point);
+        
+        var previousYIntercept = startY;        
+        edge.scanSteps = m;
+        edge.slanting = "verticalSlant";
+        
+        for(var i = 0; i < steps; i++)
+        {
+            point = new Point2D();
+            point.x = startX + i;
+            point.y = previousYIntercept + m;//find the intercept;
+            intercepts.push(point);
+            previousYIntercept = point.y;
+        }
+    }
+    else 
+    {
+        console.log('horizontal length is bigger than vertical');
+        outputToDebugWindow('horizontal bigger');
+        steps = dx;
+        var point = new Point2D();
+        point.x = startX;
+        point.y = startY;
+        intercepts.push(point);
+        
+        var previousXIntercept = startX;
+        edge.scanSteps = 1/m;
+        edge.slanting = "horizontalSlant";
+        
+        for(var i = 0; i < steps; i++)
+        {
+            point = new Point2D();
+            point.x = previousXIntercept + (1/m); //find the intercept
+            point.y = startY + i;
+            intercepts.push(point);
+            previousXIntercept = point.x;
+        }
+    }
+    
+    edge.intercepts = intercepts;
+    
+    
+    
     
 }
 
@@ -997,12 +1114,12 @@ function outputToDebugWindow(strValue, linebreak = true)
     
 }
 
-function findAllInterceptsOfEdge(point1, point2)
+function findAllInterceptsOfEdge(edge)
 {
-    var startX = point1.x;
-    var startY = point1.y;
-    var endX = point2.x;
-    var endY = point2.y;
+    var startX = edge.startPoint.x;
+    var startY = edge.startPoint.y;
+    var endX = edge.endPoint.x;
+    var endY = edge.endPoint.y;
     var dx = endX - startX;
     var dy = endY - startY;
     
