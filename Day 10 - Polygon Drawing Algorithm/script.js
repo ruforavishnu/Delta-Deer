@@ -11,6 +11,7 @@ let currentLineCoords = [100,100,300,300]; //random x1,y1 and x2,y2 values
 let linesBuffer = [];
 let frameBuffer = [];
 let parabolaBuffer = [];
+let polygonBuffer = [];
 
 let curvesBuffer = [];
 let tempBuffer = [];
@@ -41,6 +42,15 @@ class Parabola2D
 	}
 }
 
+
+class Point2D
+{
+	constructor(x,y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+}
 
 var Gcanvas = document.getElementById('canvas');
 var Gctx = canvas.getContext('2d');
@@ -822,7 +832,6 @@ function drawHyperbola(centerX, centerY, length, xParameter, yParameter)
 	}
 }
 
-
 function saveFrameBuffer()
 {
 	var currentFrameImageData = Gctx.getImageData(0,0, GcanvasWidth, GcanvasHeight);
@@ -851,6 +860,33 @@ function replaceWithPreviousFrameBuffer()//idea:find only the pixels which chang
 }
 
 
+function drawPolygon(points)
+{
+	//draw lines of each line in the polygon from index 0 to index n-1 
+	for(var i = 0; i < points.length-1; i++)
+	{
+		var startPoint = points[i];
+		var endPoint = points[i+1];
+		drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+		
+	}
+
+	//draw final line connecting endPoint to startPoint
+	var startPoint = points[points.length-1];
+	var endPoint = points[0];
+	drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+	var polyObject = 
+	{
+		values: points,
+		length: points.length
+	}
+	polygonBuffer.push(polyObject);
+	console.log('polygon buffer:');
+	console.log({polygonBuffer});
+}
+
+
 function drawScreen()
 {
 	console.log('Script loaded: true');
@@ -858,31 +894,88 @@ function drawScreen()
 	clearCanvas();
 	// saveFrameBuffer();
 	
-	var startTime = Date.now();
-	setCurrentColor(255,0,0,255);	
-	var t2 = Date.now();
-	setCurrentColor(255,0,0,255);	
 	
+	var startTime = Date.now();
+	
+	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
+	
+	setCurrentColor(255,0,0,255);
 	var point = {x:250, y:150}
 	markPoint(point);
-	// saveFrameBuffer();
-	drawParabola(point.x,point.y,20);
 
-	// setCurrentColor(0,255,0,255);	//green
-	// saveFrameBuffer();
-	// drawDDALine(0,300, 500,300);
-	// saveFrameBuffer();
-	// setCurrentColor(255,0,0,255);//red
-	// // setCurrentColor(0,255,0,255);	
-	// drawParabola(350,100,20);//try with different length also
-	// drawParabola(350,180,18);//try with different length also
-	
-	
+	var pointsArray = [];
+	var point = new Point2D();
+	point.x = 100;
+	point.y = 100;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 300;
+	point.y = 100;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 300;
+	point.y = 300;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 100;
+	point.y = 300;
+	pointsArray.push(point);
+
+	console.log(pointsArray);
+	drawPolygon(pointsArray);
+
+
+	////////////////////////////////////////////////////////////////
+	setCurrentColor(0,0,255,255);
+
+	var pointsArray = [];
+	var point = new Point2D();
+	point.x = 150;
+	point.y = 80;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 300;
+	point.y = 100;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 390;
+	point.y = 380;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 40;
+	point.y = 300;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 10;
+	point.y = 300;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 40;
+	point.y = 250;
+	pointsArray.push(point);
+
+	point = new Point2D();
+	point.x = 135;
+	point.y = 200;
+	pointsArray.push(point);
+
+	console.log(pointsArray);
+	drawPolygon(pointsArray);
+
+
 
 	
-	
+
 	var endTime = Date.now();
-	elapsedTime = endTime-startTime;
+	var elapsedTime = endTime-startTime;
 	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
 
 	

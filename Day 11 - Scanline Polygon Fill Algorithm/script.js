@@ -11,6 +11,7 @@ let currentLineCoords = [100,100,300,300]; //random x1,y1 and x2,y2 values
 let linesBuffer = [];
 let frameBuffer = [];
 let parabolaBuffer = [];
+let polygonBuffer = [];
 
 let curvesBuffer = [];
 let tempBuffer = [];
@@ -41,6 +42,26 @@ class Parabola2D
 	}
 }
 
+
+class Point2D
+{
+	constructor(x,y)
+	{
+		this.x = x;
+		this.y = y;
+	}
+}
+
+class Edge2D 
+{        
+    constructor(yUpper,xIntersect, dxPerScan, nextEdge)
+    {
+        this.yUpper = yUpper;
+        this.xIntersect = xIntersect;
+        this.dxPerScan = dxPerScan;
+        this.nextEdge = nextEdge;
+    }
+}
 
 var Gcanvas = document.getElementById('canvas');
 var Gctx = canvas.getContext('2d');
@@ -111,7 +132,7 @@ function clearCanvas()
 
 function plotPixelAtXY(x, y)//plots a red pixel at x,y coordinates
 {
-	var canvas = document.getElementById('canvas');
+    var canvas = document.getElementById('canvas');
     var ctx = canvas.getContext('2d');
     var canvasWidth = canvas.width;
     var canvasHeight = canvas.height;
@@ -230,6 +251,11 @@ function setCurrentColor(red, green, blue, alpha=255) // inputs rgb color values
 	currentPixel[1] = green;
 	currentPixel[2] = blue; 
 	currentPixel[3] = alpha
+}
+
+function getCurrentColor()
+{
+    return currentPixel;
 }
 
 function drawParallelLine(x1,y1, x2,y2)
@@ -383,7 +409,7 @@ function markLineEndpoints(line)//next add line slope to this
 
 function markPoint(point)
 {
-	const canvas = document.getElementById('canvas');
+    const canvas = document.getElementById('canvas');
     const ctx = canvas.getContext('2d');
     ctx.font = "10px Arial";
 
@@ -396,6 +422,22 @@ function markPoint(point)
 
 
 }
+
+function markPointAs(point,strValue)
+{
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    ctx.font = "10px Arial";
+
+
+    let x = point.x;
+    let y = point.y;
+    plotPixelAtXY(x,y);
+    let str = "("+strValue+")";
+    ctx.fillText(str,x,y);
+    
+}
+
 function markLineSlope(line)
 {
 	const canvas = document.getElementById('canvas');
@@ -822,7 +864,6 @@ function drawHyperbola(centerX, centerY, length, xParameter, yParameter)
 	}
 }
 
-
 function saveFrameBuffer()
 {
 	var currentFrameImageData = Gctx.getImageData(0,0, GcanvasWidth, GcanvasHeight);
@@ -851,6 +892,207 @@ function replaceWithPreviousFrameBuffer()//idea:find only the pixels which chang
 }
 
 
+function drawPolygon(points)
+{
+	//draw lines of each line in the polygon from index 0 to index n-1 
+	for(var i = 0; i < points.length-1; i++)
+	{
+		var startPoint = points[i];
+		var endPoint = points[i+1];
+		drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+		
+	}
+
+	//draw final line connecting endPoint to startPoint
+	var startPoint = points[points.length-1];
+	var endPoint = points[0];
+	drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+
+	
+
+	var polyObject = 
+	{
+		values: points,
+		length: points.length
+	}
+	polygonBuffer.push(polyObject);
+	console.log('polygon buffer:');
+	console.log({polygonBuffer});
+
+}
+
+function scanlinePolygonFillAlgorithm(polyObject)
+{
+    var polyObject = polygonBuffer[0];
+    var points = polyObject.values;
+    var polyLength = polyObject.length;
+    
+    //task 1: find the topmost , bottommost , leftmost and rightmost vertices of the polygon    
+    var topmostVertex = points[0];
+    var bottomMostVertex = points[0];
+    var leftmostVertex = points[0];
+    var rightmostVertex = points[0];
+    
+    var nodeNames = ["A", "B", "C", "D", "E"];
+    
+    for(var i =0; i < polyLength; i++)
+    {
+        if(points[i].y < topmostVertex.y)
+        {
+            topmostVertex = points[i];
+        }
+        if(points[i].y > bottomMostVertex.y)
+        {
+            bottomMostVertex = points[i];
+        }
+        
+        if(points[i].x < leftmostVertex.x)
+        {
+            leftmostVertex = points[i];
+        }
+        if(points[i].x > rightmostVertex.x);
+        {
+            rightmostVertex = points[i];
+        }
+        
+        //now mark these points as A,B,C.. etc        
+        markPointAs(points[i], nodeNames[i]);
+    }
+    
+    
+    var myIntercepts = findAllInterceptsOfEdge(points[0], points[1]);//pass 2 points as a line segment and finds/returns all the intercepts on that linesegment
+    
+    console.log({myIntercepts});
+    var myColor = getCurrentColor();
+    setCurrentColor(0,150,0,255);
+    var edge1 = myIntercepts[0];
+    var edge2 = myIntercepts[1];
+    for(var i = 0; i < myIntercepts.length; i++)
+    {
+        if(i%5==0)
+        {
+            var point = myIntercepts[i];            
+            drawMidpointCircle(point.x, point.y, 2);
+        }      
+        
+    }
+    setCurrentColor(myColor);//revert color to previous
+    
+    var myEdge = findAllInterceptsOfEdge(points[0], points[1]);
+    
+    
+   
+    
+}
+
+function outputToDebugWindow(strValue, linebreak = true)
+{
+    const debugWindow = document.querySelector('#debugParagraph');
+    var str  = debugWindow.innerHTML;;
+    str = str + strValue;
+    if(linebreak)
+        debugWindow.innerHTML = str+'</br>';
+    else
+        debugWindow.innerHTML = str;
+    
+}
+
+function findAllInterceptsOfEdge(point1, point2)
+{
+    var startX = point1.x;
+    var startY = point1.y;
+    var endX = point2.x;
+    var endY = point2.y;
+    var dx = endX - startX;
+    var dy = endY - startY;
+    
+    var intercepts = [];
+    
+    
+    
+    
+    //next find m (slope) of the line
+    var m = dy/dx;
+    var steps = 0;
+    
+    //choose the longest as the parameter for stepping one by one
+    if(Math.abs(dy) > Math.abs(dx))
+    {
+        steps = dy;
+        console.log('vertical length is bigger than horizontal');
+        outputToDebugWindow('vertical bigger');
+        var point = new Point2D();
+        point.x = startX;
+        point.y = startY;
+        intercepts.push(point);
+        
+        var previousYIntercept = startY;
+        for(var i = 0; i < steps; i++)
+        {
+            point = new Point2D();
+            point.x = startX + i;
+            point.y = previousYIntercept + m;//find the intercept;
+            intercepts.push(point);
+            previousYIntercept = point.y;
+        }
+    }
+    else 
+    {
+        console.log('horizontal length is bigger than vertical');
+        outputToDebugWindow('horizontal bigger');
+        steps = dx;
+        var point = new Point2D();
+        point.x = startX;
+        point.y = startY;
+        intercepts.push(point);
+        
+        var previousXIntercept = startX;
+        for(var i = 0; i < steps; i++)
+        {
+            point = new Point2D();
+            point.x = previousXIntercept + (1/m); //find the intercept
+            point.y = startY + i;
+            intercepts.push(point);
+            previousXIntercept = point.x;
+        }
+    }
+    
+    return intercepts;
+    
+    
+    
+    
+    
+}
+
+function drawGrid()
+{
+    var currentColor =  getCurrentColor();
+    
+    setCurrentColor(0,0,0,20);
+    for(var i = 0; i < GcanvasWidth; i++)
+    {
+        if(i%10==0)
+        {
+            drawDDALine(i, 0, i, GcanvasHeight);
+        }
+    }
+    
+    for(var i = 0; i < GcanvasHeight; i++)
+    {
+        if(i%10==0)
+        {
+            
+            drawDDALine(0,i, GcanvasWidth, i );
+        }
+    }
+    
+    setCurrentColor(currentColor);
+    
+    
+}
+
+
 function drawScreen()
 {
 	console.log('Script loaded: true');
@@ -858,36 +1100,63 @@ function drawScreen()
 	clearCanvas();
 	// saveFrameBuffer();
 	
+        drawGrid();
+	
 	var startTime = Date.now();
-	setCurrentColor(255,0,0,255);	
-	var t2 = Date.now();
-	setCurrentColor(255,0,0,255);	
 	
-	var point = {x:250, y:150}
-	markPoint(point);
-	// saveFrameBuffer();
-	drawParabola(point.x,point.y,20);
+	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
+	
+	setCurrentColor(255,0,0,255);
 
-	// setCurrentColor(0,255,0,255);	//green
-	// saveFrameBuffer();
-	// drawDDALine(0,300, 500,300);
-	// saveFrameBuffer();
-	// setCurrentColor(255,0,0,255);//red
-	// // setCurrentColor(0,255,0,255);	
-	// drawParabola(350,100,20);//try with different length also
-	// drawParabola(350,180,18);//try with different length also
-	
-	
+	var pointsArray = [];
+	setCurrentColor(0,0,255,255);
+
+	var pointsArray = [];
+	var point = new Point2D();//1
+	point.x = 120;
+	point.y = 100;
+	pointsArray.push(point);
+
+	point = new Point2D();//2
+	point.x = 180;
+	point.y = 170;
+	pointsArray.push(point);
+
+	point = new Point2D();//3
+	point.x = 330;
+	point.y = 120;
+	pointsArray.push(point);
+
+	point = new Point2D();//4
+	point.x = 350;
+	point.y = 270;
+	pointsArray.push(point);
+
+	point = new Point2D();//5
+	point.x = 160;
+	point.y = 350;
+	pointsArray.push(point);
 
 	
+
+	console.log(pointsArray);
+	drawPolygon(pointsArray);
+
+        scanlinePolygonFillAlgorithm(polygonBuffer[0]);
+        
+
 	
+
 	var endTime = Date.now();
-	elapsedTime = endTime-startTime;
+	var elapsedTime = endTime-startTime;
 	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
 
 	
 	const debugWindow = document.querySelector('#debugParagraph');
 	// debugWindow.innerHTML = `x1:${x1}, y1:${y1},</br> x2:${x2}, y2:${y2}`;
+        outputToDebugWindow("hey there");
+        outputToDebugWindow("Line 2 ", false);
+        outputToDebugWindow("Line 3", false);
 }
 
 
