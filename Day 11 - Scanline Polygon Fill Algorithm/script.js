@@ -54,7 +54,7 @@ class Point2D
 
 class Edge2D 
 {        
-    constructor(startPoint, endPoint, yUpper,intercepts, scanSteps, nextEdge, slanting)
+    constructor(startPoint, endPoint, yUpper,intercepts, scanSteps, nextEdge, slanting, slope)
     {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
@@ -64,6 +64,7 @@ class Edge2D
         this.scanSteps = scanSteps;
         this.nextEdge = nextEdge;
         this.slanting = slanting;
+        this.slope = slope;
     }
 }
 
@@ -191,6 +192,13 @@ function drawDDALine(x1, y1, x2, y2)
 	//markLineSlope(currentLine);
 	linesBuffer.push(currentLine);
 
+}
+
+function findSlope(line)
+{
+    
+    var m = (line.y2 - line.y1)/(line.x2-line.x1);    
+    return m;
 }
 
 function drawDDALineWithAnimation(x1,y1,x2,y2)
@@ -967,14 +975,11 @@ function scanlinePolygonFillAlgorithm(polyObject)
     var edge1 = new Edge2D();
     edge1.startPoint = points[0];
     edge1.endPoint = points[1];
-
-
     populateEdgeProperties(edge1);
     
     var edge2 = new Edge2D();
     edge2.startPoint = points[1];
-    edge2.endPoint = points[2];
-    
+    edge2.endPoint = points[2];    
     edge1.nextEdge = edge2;
     
     console.log('edge1:');
@@ -1008,11 +1013,131 @@ function scanlinePolygonFillAlgorithm(polyObject)
     console.log('edgeList:');
     console.log({edgeList});
     
-    for(var i = 0; i < edgeList.length; i++)
+    ////////////////////////edge population completed/////////////////
+    
+    
+    //TODO: find intersection point of two line segments
+    
+    var line1 = new Line2D();
+    line1.x1 = edgeList[0].startPoint.x;
+    line1.y1 = edgeList[0].startPoint.y;
+    line1.x2 = edgeList[0].endPoint.x;
+    line1.y2 = edgeList[0].endPoint.y;
+    
+    
+    //choose a scanline where it surely intersects. say, its scanline#250
+    var line2 = new Line2D();
+    line2.x1 = 0;
+    line2.y1 = 250;
+    line2.x2 = GcanvasWidth;
+    line2.y2 = 250;
+    
+    
+    //now lets check for intersection of line1 and line2
+    
+    var point = new Point2D();
+    point = findIntersectionOf(line1, line2);
+    
+    
+    
+
+
+    
+    
+}
+
+function findIntersectionOf(line1, line2)//if returns null, there is no intersection
+{
+//To check if two line segments intersect
+//
+//
+//1. Check mutual interval existence
+//2. Calculate values of A1, A2, b1, b2 and Xa
+//3. Check that Xa is included in the mutual interval.
+//
+
+    
+    class Interval2D
     {
-        var endPoint = edgeList[i].endPoint;
-        drawMidpointCircle(endPoint.x, endPoint.y, 5);
+        constructor(min,max)
+        {
+            this.min = min;
+            this.max = max;
+        }
     }
+    //Segment1 = {(X1, Y1), (X2, Y2)}
+    //Segment2 = {(X3, Y3), (X4, Y4)}
+    
+    var x1 = line1.x1;
+    var x2 = line1.x2;
+    var y1 = line1.y1;
+    var y2 = line1.y2;
+    
+    var x3 = line2.x1;
+    var x4 = line2.x2;
+    var y3 = line2.y1;
+    var y4 = line2.y2;
+    
+    
+//    The abscissa Xa of the potential point of intersection (Xa,Ya) must be contained in both interval I1 and I2, defined as follow :
+//
+//    I1 = [min(X1,X2), max(X1,X2)]
+//    I2 = [min(X3,X4), max(X3,X4)]
+    
+    
+    //find the intervals
+    var interval1 = new Interval2D();
+    interval1.min = findMinimumOf(x1,x2);
+    interval1.max = findMaximumOf(x1,x2);
+    
+    var interval2 = new Interval2D();
+    interval2.min = findMinimumOf(x3,x4);
+    interval2.max = findMaximumOf(x3,x4);
+    
+    //now, find if mutual interval exists
+    if ((findMaximumOf(line1.x1, line1.x2) < findMinimumOf(line2.x1, line2.x2)) )
+    {   //return false, there is no mutual abscissa
+        return null;        
+    }
+    //so there is intersection, now find the intersected point's coordinate
+    
+//    So, we have two line formula, and a mutual interval. Your line formulas are:
+//
+//    f1(x) = A1*x + b1 = y
+//    f2(x) = A2*x + b2 = y
+
+    //or
+    //   f1(x) = m1*x + b1 = y
+    //or f2(x) = m2*x + b2 = y //where m is slope and b is y intercept
+    
+    
+    var m1 = findSlope(line1);
+    var m2 = findSlope(line2);
+    var b1 = line1.y1 - m1*line1.x1;
+    var b2 = line2.y1 - m2*line2.x1;
+    
+    //so now we have found m1, m2, b1, b2
+    
+    if(m1 == m2)//the slopes are same, means the lines are parallel, so no intersection
+        return null;
+    
+    //A point (Xa,Ya) standing on both line must verify both formulas f1 and f2:
+    //means
+    //Ya = m1*Xa + b1 AND
+    //Ya = m1*Xa + b2
+    //=> m1*Xa + b1 = m2*Xa + b2
+    //means our abscissa or the x intercept or Xa is
+    // Xa = (b2-b1)/ (m1-m2)
+    
+    var Xa = (b2-b1)/(m2-m1);
+    
+    var min1 = findMinimumOf(line1.x1, line1.x2);
+    var min2 = findMinimumOf(line2.x1, line2.x2);
+    var max1 = findMaximumOf(line1.x1, line1.x2);
+    var max2 = findMaximumOf(line2.x1, line2.x2);
+    
+    var p = findMaximumOf(min1, min2);
+    var q = 
     
     
     
@@ -1020,10 +1145,26 @@ function scanlinePolygonFillAlgorithm(polyObject)
     
     
     
+    
+    
+}
 
 
-    //var myEdge = findAllInterceptsOfEdge(points[0], points[1]);
+function findMinimumOf(a,b)
+{
+    if(a < b)//no need to check for == or equal to because our reqmt is just to find the minimum
+        return a;
+    else
+        return b;
     
+}
+
+function findMaximumOf(a,b)
+{
+    if(a > b)
+        return a;
+    else
+        return b;
 }
 
 function populateEdgeProperties(edge)
@@ -1038,6 +1179,8 @@ function populateEdgeProperties(edge)
     
      //next find m (slope) of the line
     var m = dy/dx;
+    edge.slope = m;
+    
     var steps = 0;
     if(startY > endY)
         edge.yUpper = endY;
@@ -1061,6 +1204,7 @@ function populateEdgeProperties(edge)
         var previousYIntercept = startY;        
         edge.scanSteps = m;
         edge.slanting = "verticalSlant";
+        
         
         for(var i = 0; i < steps; i++)
         {
@@ -1217,15 +1361,8 @@ function drawScreen()
 	clearCanvas();
 	// saveFrameBuffer();
 	
-        drawGrid();
-	
-	var startTime = Date.now();
-	
-	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
-	
-	setCurrentColor(255,0,0,255);
-
-	var pointsArray = [];
+        drawGrid();	
+	var startTime = Date.now();	
 	setCurrentColor(0,0,255,255);
 
 	var pointsArray = [];
@@ -1252,14 +1389,30 @@ function drawScreen()
 	point = new Point2D();//5
 	point.x = 160;
 	point.y = 350;
-	pointsArray.push(point);
+	pointsArray.push(point);	
 
-	
-
-	console.log(pointsArray);
-	drawPolygon(pointsArray);
-
-        scanlinePolygonFillAlgorithm(polygonBuffer[0]);
+//	console.log(pointsArray);
+//	drawPolygon(pointsArray);//draws the polygon
+//        scanlinePolygonFillAlgorithm(polygonBuffer[0]);//scanline polygon filling algorithm
+        
+        pointsArray = [];
+        var point = new Point2D();
+        point.x = 200;
+        point.y = 200;
+        pointsArray.push(point);
+        
+        var point = new Point2D();
+        point.x = 140;
+        point.y = 350;
+        pointsArray.push(point);
+        
+        var point = new Point2D();
+        point.x = 260;
+        point.y = 350;
+        pointsArray.push(point);
+        drawPolygon(pointsArray);//draws the polygon
+        scanlinePolygonFillAlgorithm(polygonBuffer[polygonBuffer.length-1]);//scanline polygon filling algorithm
+        
         
 
 	

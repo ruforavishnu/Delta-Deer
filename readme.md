@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60 mins
-or 1315 mins
-or 20 hours 15 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90 mins
+or 1405 mins
+or 21 hours 45 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -101,3 +101,8 @@ Time spent : 1 hour
 1. Created an Edge2D class and populated all necessary atributes to the class object. 
 Now, need to find the coordinates at which the the scanline intersects the edge.
 
+Commit#18
+Time spent: 1hour 30 mins
+
+1. Still figuring out the scan line polygon fill algorithm.
+2. Found out how to find intersection of 2 line segments and writing a function for that purpose. 
