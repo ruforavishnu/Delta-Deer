@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90 mins
-or 1405 mins
-or 21 hours 45 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15 mins
+or 1420 mins
+or 22 hours 0 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -106,3 +106,10 @@ Time spent: 1hour 30 mins
 
 1. Still figuring out the scan line polygon fill algorithm.
 2. Found out how to find intersection of 2 line segments and writing a function for that purpose. 
+
+
+Commit#19
+Time spent: 15 mins
+
+1. Found out the intersection point of the scanline and an edge of the polygon. Now just need to find 
+the intersection pairs and sort it and we are done.

@@ -1028,15 +1028,39 @@ function scanlinePolygonFillAlgorithm(polyObject)
     //choose a scanline where it surely intersects. say, its scanline#250
     var line2 = new Line2D();
     line2.x1 = 0;
-    line2.y1 = 250;
+    line2.y1 = 290;
     line2.x2 = GcanvasWidth;
-    line2.y2 = 250;
+    line2.y2 = 290;
+    
+    var c = getCurrentColor();
+    setCurrentColor(255, 100,0, 255);
+    
+    
+    var pt = new Point2D();
+    pt.x = line1.x1;
+    pt.y = line1.y1;
+    markPointAs( pt, "(x1,y1)" );
+    drawDDALine(line1.x1, line1.y1, line1.x2, line1.y2);
+    var pt = new Point2D();
+    pt.x = line2.x1;
+    pt.y = line2.y1;
+    markPointAs( pt, "(x2,y2)" );
+    drawDDALine(line2.x1, line2.y1, line2.x2, line2.y2);
     
     
     //now lets check for intersection of line1 and line2
     
+    var Xa = findIntersectionXCoordinateOf(line1, line2);
+    console.log('Xa:'+ Xa);
     var point = new Point2D();
-    point = findIntersectionOf(line1, line2);
+    point.x = Xa;
+    point.y = line1.y1;
+    markPoint(point);
+    
+    var pt = new Point2D();
+    pt.x = Xa;
+    pt.y = 290;
+    markPoint(pt)
     
     
     
@@ -1046,7 +1070,7 @@ function scanlinePolygonFillAlgorithm(polyObject)
     
 }
 
-function findIntersectionOf(line1, line2)//if returns null, there is no intersection
+function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is no intersection
 {
 //To check if two line segments intersect
 //
@@ -1055,6 +1079,11 @@ function findIntersectionOf(line1, line2)//if returns null, there is no intersec
 //2. Calculate values of A1, A2, b1, b2 and Xa
 //3. Check that Xa is included in the mutual interval.
 //
+
+    var color = getCurrentColor();
+    setCurrentColor(0,255,0, 255);
+    console.log('inside findIntersection, changed color');
+    
 
     
     class Interval2D
@@ -1094,8 +1123,19 @@ function findIntersectionOf(line1, line2)//if returns null, there is no intersec
     interval2.min = findMinimumOf(x3,x4);
     interval2.max = findMaximumOf(x3,x4);
     
+    console.log('interval1:');
+    console.log(interval1);
+    console.log('interval2:');
+    console.log(interval2);
+    
+//    And we could say that Xa is included into :
+//
+//    Ia = [max( min(X1,X2), min(X3,X4) ),
+//          min( max(X1,X2), max(X3,X4) )]
+
+    
     //now, find if mutual interval exists
-    if ((findMaximumOf(line1.x1, line1.x2) < findMinimumOf(line2.x1, line2.x2)) )
+    if ((findMaximumOf(x1,x2) < findMinimumOf(x3,x4)) )
     {   //return false, there is no mutual abscissa
         return null;        
     }
@@ -1113,8 +1153,13 @@ function findIntersectionOf(line1, line2)//if returns null, there is no intersec
     
     var m1 = findSlope(line1);
     var m2 = findSlope(line2);
-    var b1 = line1.y1 - m1*line1.x1;
-    var b2 = line2.y1 - m2*line2.x1;
+    var b1 = y1 - m1*x1;
+    var b2 = y3 - m2*x3;
+    
+    console.log('m1:'+m1);
+    console.log('m2:'+m2);
+    console.log('b1:'+b1);
+    console.log('b2:'+b2);
     
     //so now we have found m1, m2, b1, b2
     
@@ -1129,22 +1174,26 @@ function findIntersectionOf(line1, line2)//if returns null, there is no intersec
     //means our abscissa or the x intercept or Xa is
     // Xa = (b2-b1)/ (m1-m2)
     
-    var Xa = (b2-b1)/(m2-m1);
+    var Xa = Math.abs((b2-b1)/(m2-m1));//to avoid negative numbers in slope variables
     
-    var min1 = findMinimumOf(line1.x1, line1.x2);
-    var min2 = findMinimumOf(line2.x1, line2.x2);
-    var max1 = findMaximumOf(line1.x1, line1.x2);
-    var max2 = findMaximumOf(line2.x1, line2.x2);
+    var min1 = findMinimumOf(x1,x2);
+    var min2 = findMinimumOf(x3,x4);
+    var max1 = findMaximumOf(x1,x2);
+    var max2 = findMaximumOf(x3,x4);
     
     var p = findMaximumOf(min1, min2);
-    var q = 
+    var q = findMinimumOf(max1, max2);
     
+    console.log('Xa:'+Xa);
+    console.log('p:'+p);
+    console.log('q:'+q);
     
-    
-    
-    
-    
-    
+    if( (Xa < p ) || (Xa > q) )
+    {
+        return -501; //intersection is not possible. its out of bounds
+    }
+    else
+        return Xa;
     
     
 }
