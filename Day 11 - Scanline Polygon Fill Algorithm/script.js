@@ -1010,57 +1010,157 @@ function scanlinePolygonFillAlgorithm(polyObject)
     }
     edgeList[edgeList.length-1].nextEdge = edgeList[0];
     
-    console.log('edgeList:');
-    console.log({edgeList});
+//    console.log('edgeList:');
+//    console.log({edgeList});
     
     ////////////////////////edge population completed/////////////////
     
     
     //TODO: find intersection point of two line segments
     
-    var line1 = new Line2D();
-    line1.x1 = edgeList[0].startPoint.x;
-    line1.y1 = edgeList[0].startPoint.y;
-    line1.x2 = edgeList[0].endPoint.x;
-    line1.y2 = edgeList[0].endPoint.y;
+//    var line1 = new Line2D();
+//    line1.x1 = edgeList[0].startPoint.x;
+//    line1.y1 = edgeList[0].startPoint.y;
+//    line1.x2 = edgeList[0].endPoint.x;
+//    line1.y2 = edgeList[0].endPoint.y;
+//    
+//    
+//    //choose a scanline where it surely intersects. say, its scanline#250
+//    var line2 = new Line2D();
+//    line2.x1 = 0;
+//    line2.y1 = 290;
+//    line2.x2 = GcanvasWidth;
+//    line2.y2 = 290;
+//    
+//    var c = getCurrentColor();
+//    setCurrentColor(255, 100,0, 255);
+//    
+//    
+//    var pt = new Point2D();
+//    pt.x = line1.x1;
+//    pt.y = line1.y1;
+//    markPointAs( pt, "(x1,y1)" );
+//    drawDDALine(line1.x1, line1.y1, line1.x2, line1.y2);
+//    var pt = new Point2D();
+//    pt.x = line2.x1;
+//    pt.y = line2.y1;
+//    markPointAs( pt, "(x2,y2)" );
+//    drawDDALine(line2.x1, line2.y1, line2.x2, line2.y2);
+//    
+//    
+//    //now lets check for intersection of line1 and line2
+//    
+//    var Xa = findIntersectionXCoordinateOf(line1, line2);
+//    console.log('Xa:'+ Xa);
+//    var point = new Point2D();
+//    point.x = Xa;
+//    point.y = line1.y1;
+//    markPoint(point);
+//    
+//    var pt = new Point2D();
+//    pt.x = Xa;
+//    pt.y = 290;
+//    markPoint(pt)
     
     
-    //choose a scanline where it surely intersects. say, its scanline#250
-    var line2 = new Line2D();
-    line2.x1 = 0;
-    line2.y1 = 290;
-    line2.x2 = GcanvasWidth;
-    line2.y2 = 290;
+    ////////////////////////////now find the intersection point of each edge with each scanline///////////
     
-    var c = getCurrentColor();
-    setCurrentColor(255, 100,0, 255);
+    var scanlineList = [];
+    
+    class ScanlineValue
+    {
+        constructor(index, intersectionList)
+        {
+            this.index = index;
+            this.intersectionList = intersectionList;
+        }
+    }
+    
+    var yCoordinate = 0;//to keep track of the y coordinate 
+    for(var i = topmostVertex.y; i < bottomMostVertex.y; i++)
+    {
+        //for each scan line check if the scanline intersects with each edge in our edgeList
+        var scanline = new Line2D();
+        scanline.x1 = 0;
+        scanline.y1 = i;
+        scanline.x2 = GcanvasWidth;
+        scanline.y2 = i;
+        
+        //now, loop through all edges in the edgeList
+        var scanRow = new ScanlineValue();
+        scanRow.index = yCoordinate;    
+        scanRow.intersectionList = [];
+        for(var j = 0; j < edgeList.length; j++)
+        {
+            var ourEdge = edgeList[j];
+            
+            //now create a line segment out of that edge for easier calculations
+            var line = new Line2D();
+            line.x1 = ourEdge.startPoint.x;
+            line.y1 = ourEdge.startPoint.y;
+            line.x2 = ourEdge.endPoint.x;
+            line.y2 = ourEdge.endPoint.y;
+            
+            //so, now we have both scanline and the line segment/edge of whose intersection point we need to find
+            
+            var Xa = findIntersectionXCoordinateOf(scanline, line);
+            
+            if(Xa != null && Xa != -501)
+            {
+                
+                var pt = new Point2D();
+                pt.x = Xa;
+                pt.y = topmostVertex.y + yCoordinate;
+                scanRow.intersectionList.push(pt);
+//                console.log('pushed into intersectionList , the point:');
+//                console.log(pt);
+            }
+            else
+            {
+//                console.log('Scan line did not intersect with the line at yCoordinate: '+yCoordinate);
+            }
+        }
+        
+        scanlineList.push(scanRow);
+        yCoordinate++;
+        
+    }
+    
+    console.log('Scanline List:');
+    console.log(scanlineList);
+    
+    ////////////////now we need to sort the values of intersectionList[] in ascending order/////////
+    
+    //the following has to be deleted and written for a polygon with n vertices///
+    ////before that lets try painting the fillPoly since now we have just 3 points in the triangel////
+    
+    var color = getCurrentColor();
+    setCurrentColor(0,255,0,255);
+    
+    for(var i = 0; i < scanlineList.length; i++)
+    {
+        var scanLine = scanlineList[i];
+        
+        var line1 = new Line2D();
+        var pt1 = scanLine.intersectionList[0];
+        var pt2 = scanLine.intersectionList[1];
+        
+        
+        console.log('Drawing line from ');
+        console.log(pt1);
+        console.log('to point');
+        console.log(pt2);
+//        markPointAs(pt1, "Pt1");
+//        markPointAs(pt2, "Pt2");
+        drawDDALine(pt1.x, pt1.y, pt2.x, pt2.y);
+
+
+        
+    }
+    
+    setCurrentColor(color[0], color[1], color[2], color[3]);
     
     
-    var pt = new Point2D();
-    pt.x = line1.x1;
-    pt.y = line1.y1;
-    markPointAs( pt, "(x1,y1)" );
-    drawDDALine(line1.x1, line1.y1, line1.x2, line1.y2);
-    var pt = new Point2D();
-    pt.x = line2.x1;
-    pt.y = line2.y1;
-    markPointAs( pt, "(x2,y2)" );
-    drawDDALine(line2.x1, line2.y1, line2.x2, line2.y2);
-    
-    
-    //now lets check for intersection of line1 and line2
-    
-    var Xa = findIntersectionXCoordinateOf(line1, line2);
-    console.log('Xa:'+ Xa);
-    var point = new Point2D();
-    point.x = Xa;
-    point.y = line1.y1;
-    markPoint(point);
-    
-    var pt = new Point2D();
-    pt.x = Xa;
-    pt.y = 290;
-    markPoint(pt)
     
     
     
@@ -1123,11 +1223,11 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
     interval2.min = findMinimumOf(x3,x4);
     interval2.max = findMaximumOf(x3,x4);
     
-    console.log('interval1:');
-    console.log(interval1);
-    console.log('interval2:');
-    console.log(interval2);
-    
+//    console.log('interval1:');
+//    console.log(interval1);
+//    console.log('interval2:');
+//    console.log(interval2);
+//    
 //    And we could say that Xa is included into :
 //
 //    Ia = [max( min(X1,X2), min(X3,X4) ),
@@ -1156,11 +1256,11 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
     var b1 = y1 - m1*x1;
     var b2 = y3 - m2*x3;
     
-    console.log('m1:'+m1);
-    console.log('m2:'+m2);
-    console.log('b1:'+b1);
-    console.log('b2:'+b2);
-    
+//    console.log('m1:'+m1);
+//    console.log('m2:'+m2);
+//    console.log('b1:'+b1);
+//    console.log('b2:'+b2);
+//    
     //so now we have found m1, m2, b1, b2
     
     if(m1 == m2)//the slopes are same, means the lines are parallel, so no intersection
@@ -1184,9 +1284,9 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
     var p = findMaximumOf(min1, min2);
     var q = findMinimumOf(max1, max2);
     
-    console.log('Xa:'+Xa);
-    console.log('p:'+p);
-    console.log('q:'+q);
+//    console.log('Xa:'+Xa);
+//    console.log('p:'+p);
+//    console.log('q:'+q);
     
     if( (Xa < p ) || (Xa > q) )
     {

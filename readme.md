@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90+15 mins
-or 1420 mins
-or 22 hours 0 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60 mins
+or 1480 mins
+or 23 hours 0 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -117,4 +117,11 @@ the intersection pairs and sort it and we are done.
 Commit#20
 1. Added the stackoverflow answer which provided me with the help in solving the algorithm as a pdf file 
 so later on I can clearly see how I figured out the algorithm
+
+Commit#21
+Time spent: 60 mins
+
+
+1. Figured out the scanline polygon fill algorithm. Works for a triangle. Now, need to find out whether it works
+for a polygon with n vertices. If it doesnt , need to write code for that.
 
