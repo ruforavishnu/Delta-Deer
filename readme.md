@@ -113,3 +113,8 @@ Time spent: 15 mins
 
 1. Found out the intersection point of the scanline and an edge of the polygon. Now just need to find 
 the intersection pairs and sort it and we are done.
+
+Commit#20
+1. Added the stackoverflow answer which provided me with the help in solving the algorithm as a pdf file 
+so later on I can clearly see how I figured out the algorithm
+
