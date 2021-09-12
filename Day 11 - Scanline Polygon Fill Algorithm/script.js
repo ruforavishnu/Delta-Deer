@@ -1,10 +1,13 @@
 
 
+
+
 function scanlinePolygonFillAlgorithm(polyObject)
 {
-    var polyObject = polygonBuffer[0];
+    
     var points = polyObject.values;
     var polyLength = polyObject.length;
+    var scanlineList = [];
     
     //task 1: find the topmost , bottommost , leftmost and rightmost vertices of the polygon    
     var topmostVertex = points[0];
@@ -37,24 +40,10 @@ function scanlinePolygonFillAlgorithm(polyObject)
         //now mark these points as A,B,C.. etc        
         markPointAs(points[i], nodeNames[i]);
     }
+    
    
-    
-    var edge1 = new Edge2D();
-    edge1.startPoint = points[0];
-    edge1.endPoint = points[1];
-    populateEdgeProperties(edge1);
-    
-    var edge2 = new Edge2D();
-    edge2.startPoint = points[1];
-    edge2.endPoint = points[2];    
-    edge1.nextEdge = edge2;
-    
-    console.log('edge1:');
-    console.log({edge1});
     var edgeList = [];
-    
-    //populate all edges from n=0 to n-1
-    for(var i = 0; i < polyLength-1; i++)
+    for(var i = 0; i < polyLength-1; i++)    //populate all edges from n=0 to n-1
     {
         var edge = new Edge2D();
         edge.startPoint = points[i];
@@ -63,44 +52,54 @@ function scanlinePolygonFillAlgorithm(polyObject)
         edgeList.push(edge);
     }
     
-    //now populate the final edge 
-    var edge = new Edge2D();
-    edge.startPoint = points[points.length-1];
+    var edge = new Edge2D();//now populate the final edge 
+    edge.startPoint = points[polyLength-1];
     edge.endPoint = points[0];
     populateEdgeProperties(edge);
     edgeList.push(edge);
     
+    var edgeNames = ["AB", "BC", "CD", "DE", "EA"];
     //finally, assign the nextEdge value of Edge2D object
     for(var i = 0; i< edgeList.length-1; i++)
     {
         edgeList[i].nextEdge = edgeList[i+1];
+        edgeList[i].edgeName = edgeNames[i];
     }
     edgeList[edgeList.length-1].nextEdge = edgeList[0];
+    edgeList[edgeList.length-1].edgeName = "EA";
     
     console.log('edgeList:');
     console.log({edgeList});
+    console.log('polyObject.values');
+    console.log({polyObject});
     
+    
+    
+    //debug-code-starts/////////////////
+    //plot a circle in between all the edges, we can see if the problem has already started.
+    for(var i = 0; i < edgeList.length; i++)
+    {
+        var edge = edgeList[i];
+        var midPoint = new Point2D();
+        midPoint.x = (edge.startPoint.x+ edge.endPoint.x)/2 + 0;
+        midPoint.y = (edge.startPoint.y + edge.endPoint.y)/2;
+        drawMidpointCircle(midPoint.x, midPoint.y , 5);
+        var str = edge.edgeName;
+        markPointAs(midPoint, str);
+    }
+    //debug-code-ends//////////////////
+    
+//    return;
+
     ////////////////////////edge population completed/////////////////
-    
-  
-    
     ////////////////////////////now find the intersection point of each edge with each scanline///////////
     
-    var scanlineList = [];
     
-    class ScanlineValue
-    {
-        constructor(index, intersectionList)
-        {
-            this.index = index;
-            this.intersectionList = intersectionList;
-        }
-    }
     
-    var yCoordinate = 0;//to keep track of the y coordinate 
-    console.log('edgeList length:'+edgeList.length);
+    var yCoordinate = -1;//to keep track of the y coordinate 
     for(var i = topmostVertex.y; i < bottomMostVertex.y; i++)
     {
+        yCoordinate++;
         //for each scan line check if the scanline intersects with each edge in our edgeList
         var scanline = new Line2D();
         scanline.x1 = 0;
@@ -110,14 +109,17 @@ function scanlinePolygonFillAlgorithm(polyObject)
         
         //now, loop through all edges in the edgeList
         var scanRow = new ScanlineValue();
-        scanRow.index = yCoordinate;    
+        scanRow.index = i;    
         scanRow.intersectionList = [];
         
+        var paintedEdge = [];
         //debug-code-start//////////////////
-        for(var k = 0; k < 5; k++)
+        var color = getCurrentColor();
+        setCurrentColor(128,0,128,255);
+        for(var k = 0; k < 5; k++)//drawing the same polygon translated 230pixels right for debug purposes
         {
             var ourEdge = edgeList[k];
-            
+            paintedEdge.push(ourEdge.edgeName);
             //now create a line segment out of that edge for easier calculations
             var line = new Line2D();
             line.x1 = ourEdge.startPoint.x;
@@ -126,141 +128,89 @@ function scanlinePolygonFillAlgorithm(polyObject)
             line.y2 = ourEdge.endPoint.y;
             
             drawDDALine(line.x1 + 230, line.y1, line.x2 + 230, line.y2);
-            
-            
         }
+        setCurrentColor(color[0],color[1], color[2], color[3]);
+        
+        
         //debug-code-end///////////////////
         
-        for(var j = 0; j < edgeList.length ; j++)
-        {
-            var ourEdge = edgeList[j];
-            
-            //now create a line segment out of that edge for easier calculations
-            var line = new Line2D();
-            line.x1 = ourEdge.startPoint.x;
-            line.y1 = ourEdge.startPoint.y;
-            line.x2 = ourEdge.endPoint.x;
-            line.y2 = ourEdge.endPoint.y;
-            
-//            //debug-code-start//////////////////
-//            drawDDALine(line.x1 + 230, line.y1, line.x2 + 230, line.y2);
-//            //debug-code-end///////////////////
-//            
-            
-            //so, now we have both scanline and the line segment/edge of whose intersection point we need to find
-            var Xa = findIntersectionXCoordinateOf(scanline, line);
-            
-            if(Xa != null && Xa != -501)
-            {
-                
-                var pt = new Point2D();
-                pt.x = Xa;
-                pt.y = topmostVertex.y + yCoordinate;
-                scanRow.intersectionList.push(pt);
-                
-                
-                //debug-code-start/////////////
-                drawMidpointCircle(pt.x+230, pt.y, 3);
-                //debug-code-end///////////////
-            }
-            else
-            {
-//                console.log('Scan line did not intersect with the line at yCoordinate: '+yCoordinate);
-            }
-        }
-        
         scanlineList.push(scanRow);
-        yCoordinate++;
         
     }
+//    return;
     
-    console.log('Scanline List:');
+    console.log('Scanline List, before sorting:');
     console.log(scanlineList);
+    console.log('paintedEdge');
+    console.log({paintedEdge});
     
-    ////////////////now we need to sort the values of intersectionList[] in ascending order/////////
     
-    //the following has to be deleted and written for a polygon with n vertices///
-    ////before that lets try painting the fillPoly since now we have just 3 points in the triangel////
-    
-//    var color = getCurrentColor();
-//    setCurrentColor(0,255,0,255);
-//    
-//    for(var i = 0; i < scanlineList.length; i++)
-//    {
-//        var scanLine = scanlineList[i];
-//        
-//        var line1 = new Line2D();
-//        var pt1 = scanLine.intersectionList[0];
-//        var pt2 = scanLine.intersectionList[1];
-//        
-//        
-//        console.log('Drawing line from ');
-//        console.log(pt1);
-//        console.log('to point');
-//        console.log(pt2);
-////        markPointAs(pt1, "Pt1");
-////        markPointAs(pt2, "Pt2");
-//        drawDDALine(pt1.x, pt1.y, pt2.x, pt2.y);
-//        
-//    }
-//    
-//    setCurrentColor(color[0], color[1], color[2], color[3]);
-
+//    return;
 ////////////////now we need to sort the values of intersectionList[] in ascending order/////////
 
-        for(var i = 0; i < scanlineList.length; i++)
+        for(var i = 0; i < scanlineList.length ; i++)
         {
-            var scanLine = scanlineList[i];
-            var iList = scanLine.intersectionList;//this contains our list of coords
-            var index = scanLine.index;
-            var sortediList = iList.sort(function(a,b) {
+//            var scanLine = scanlineList[i];
+//            var iList = scanLine.intersectionList;//this contains our list of coords
+//            var index = scanLine.index;
+//            
+            scanlineList[i].intersectionList.sort(function(a,b) {
                if(a.x > b.x) 
                    return 1;
                else 
                    return -1;
             });
             
-            for(var j = 0; j < sortediList.length; j+=2)
+        }
+        
+        console.log('Scanline List, after sorting:');
+        console.log(scanlineList);
+        
+        return;
+        
+////////////finished sorting////////////////////////////////
+
+
+        
+        for(var i = 0; i < scanlineList.length; i++)
+        {    
+            var scanrow = scanlineList[i];
+            console.log({scanrow});
+            var intercepts = [];
+            intercepts = scanrow.intersectionList;
+            
+            for(var j = 0; j < intercepts.length; j+=2)
             {
-                
-                if(index > 0 && index < 190)
+                if(intercepts[j+1]  && intercepts.length %2 === 0)//if the object exists and is not null
                 {
-                    if(sortediList[j+1] )
-                    {
-                        var startPoint = new Point2D();
-                        var endPoint = new Point2D();
+                    var startPoint = new Point2D();
+                    var endPoint = new Point2D();
 
-                        startPoint.x = sortediList[j].x;
-                        startPoint.y = sortediList[j].y;
-                        endPoint.x = sortediList[j+1].x;
-                        endPoint.y = sortediList[j+1].y                    
+                    startPoint.x = intercepts[j].x;
+                    startPoint.y = intercepts[j].y;
+                    endPoint.x = intercepts[j+1].x;
+                    endPoint.y = intercepts[j+1].y                    
 
-                        drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-
-                    }
+                    drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
+                    
                 }
-                
+                else if( sortediList.length %2 === 1)//its odd
+                {
+                    console.log('else if condition invoked at j:'+j);
+                    console.log('sortediList:');
+                    console.log({sortediList});
+                }
                 else
                 {
-                    if(sortediList[j+2] )
-                    {
-                        var startPoint = new Point2D();
-                        var endPoint = new Point2D();
-
-                        startPoint.x = sortediList[j].x;
-                        startPoint.y = sortediList[j].y;
-                        endPoint.x = sortediList[j+1].x;
-                        endPoint.y = sortediList[j+1].y                    
-
-                        drawDDALine(startPoint.x, startPoint.y, endPoint.x, endPoint.y);
-
-                    }
+                    console.log('else condition invoked at j:'+j);
+                    console.log('sortediList:');
+                    console.log({sortediList});
                 }
-               
-                
             }
         }
-            
+        
+        
+       
     
     
 }
@@ -277,9 +227,6 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
 
     var color = getCurrentColor();
     setCurrentColor(0,255,0, 255);
-    console.log('inside findIntersection, changed color');
-    
-
     
     class Interval2D
     {
@@ -358,7 +305,7 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
 //    
     //so now we have found m1, m2, b1, b2
     
-    if(m1 == m2)//the slopes are same, means the lines are parallel, so no intersection
+    if(m1 === m2)//the slopes are same, means the lines are parallel, so no intersection
         return null;
     
     //A point (Xa,Ya) standing on both line must verify both formulas f1 and f2:
@@ -379,18 +326,11 @@ function findIntersectionXCoordinateOf(line1, line2)//if returns null, there is 
     var p = findMaximumOf(min1, min2);
     var q = findMinimumOf(max1, max2);
     
-//    console.log('Xa:'+Xa);
-//    console.log('p:'+p);
-//    console.log('q:'+q);
     
     if( (Xa < p ) || (Xa > q) )
-    {
         return -501; //intersection is not possible. its out of bounds
-    }
     else
         return Xa;
-    
-    
 }
 
 
@@ -421,8 +361,6 @@ function populateEdgeProperties(edge)
     if(Math.abs(dy) > Math.abs(dx))
     {
         steps = dy;
-        console.log('vertical length is bigger than horizontal');
-        outputToDebugWindow('vertical bigger');
         var point = new Point2D();
         point.x = startX;
         point.y = startY;
@@ -431,7 +369,6 @@ function populateEdgeProperties(edge)
         var previousYIntercept = startY;        
         edge.scanSteps = m;
         edge.slanting = "verticalSlant";
-        
         
         for(var i = 0; i < steps; i++)
         {
@@ -444,8 +381,6 @@ function populateEdgeProperties(edge)
     }
     else 
     {
-        console.log('horizontal length is bigger than vertical');
-        outputToDebugWindow('horizontal bigger');
         steps = dx;
         var point = new Point2D();
         point.x = startX;
@@ -456,21 +391,21 @@ function populateEdgeProperties(edge)
         edge.scanSteps = 1/m;
         edge.slanting = "horizontalSlant";
         
+        var xStep = 1/m;
+        if(m === 0 || m === NaN)
+        {
+            xStep = 1;
+        }
         for(var i = 0; i < steps; i++)
         {
             point = new Point2D();
-            point.x = previousXIntercept + (1/m); //find the intercept
+            point.x = previousXIntercept + xStep; //find the intercept
             point.y = startY + i;
             intercepts.push(point);
             previousXIntercept = point.x;
         }
     }
-    
     edge.intercepts = intercepts;
-    
-    
-    
-    
 }
 
 
@@ -479,7 +414,6 @@ function drawScreen()
 	console.log('Script loaded: true');
 	initCanvas();
 	clearCanvas();
-	
 	
         drawGridWithMarkers();	
 	var startTime = Date.now();	
@@ -510,43 +444,13 @@ function drawScreen()
 	point.x = 160;
 	point.y = 350;
 	pointsArray.push(point);	
-
-//	console.log(pointsArray);
 	drawPolygon(pointsArray);//draws the polygon
         scanlinePolygonFillAlgorithm(polygonBuffer[0]);//scanline polygon filling algorithm
         
-//        pointsArray = [];
-//        var point = new Point2D();
-//        point.x = 200;
-//        point.y = 200;
-//        pointsArray.push(point);
-//        
-//        var point = new Point2D();
-//        point.x = 140;
-//        point.y = 350;
-//        pointsArray.push(point);
-//        
-//        var point = new Point2D();
-//        point.x = 260;
-//        point.y = 350;
-//        pointsArray.push(point);
-//        drawPolygon(pointsArray);//draws the polygon
-//        scanlinePolygonFillAlgorithm(polygonBuffer[polygonBuffer.length-1]);//scanline polygon filling algorithm
-        
-        
-
-	
-
 	var endTime = Date.now();
 	var elapsedTime = endTime-startTime;
-	console.log('Time taken for drawing ellipse :'+elapsedTime+' milliseconds');
-
-	
+	console.log('Time taken for drawing screen :'+elapsedTime+' milliseconds');
 	const debugWindow = document.querySelector('#debugParagraph');
-	// debugWindow.innerHTML = `x1:${x1}, y1:${y1},</br> x2:${x2}, y2:${y2}`;
-        outputToDebugWindow("hey there");
-        outputToDebugWindow("Line 2 ", false);
-        outputToDebugWindow("Line 3", false);
 }
 
 

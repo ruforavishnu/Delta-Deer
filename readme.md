@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120 mins
-or 1600 mins
-or 25 hours 0 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120+150 mins
+or 1750 mins
+or 27 hours 30 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -130,3 +130,12 @@ Time spent: 120mins
 
 1. Changed previous written scripts to a header-file format in the file previousScripts.js
 2. An extra edge seems to have gotten into the edgeList. So the fillPolygon method paints some bizzarre lines. Need to figure what went wrong and correct it.
+
+
+Commit#23
+Time spent: 150 mins
+
+1. Polygon fill algorithm worked for simple 3 vertex polygon or a triangle
+2. Polygon fill for concave n vertex polygon still not complete.
+3. Still not solved the scanline polygon fill algorithm. An edge has got itself placed inside the edgeList and its 
+creating problems with plotting the lines.
