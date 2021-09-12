@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60 mins
-or 1480 mins
-or 23 hours 0 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120 mins
+or 1600 mins
+or 25 hours 0 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -125,3 +125,8 @@ Time spent: 60 mins
 1. Figured out the scanline polygon fill algorithm. Works for a triangle. Now, need to find out whether it works
 for a polygon with n vertices. If it doesnt , need to write code for that.
 
+Commit#22 
+Time spent: 120mins
+
+1. Changed previous written scripts to a header-file format in the file previousScripts.js
+2. An extra edge seems to have gotten into the edgeList. So the fillPolygon method paints some bizzarre lines. Need to figure what went wrong and correct it.
