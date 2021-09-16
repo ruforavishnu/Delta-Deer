@@ -60,7 +60,7 @@ class Point2D
 
 class Edge2D 
 {        
-    constructor(startPoint, endPoint, yUpper,intercepts, scanSteps, nextEdge, slanting, slope, edgeName)
+    constructor(startPoint, endPoint, yUpper,intercepts, scanSteps, nextEdge,prevEdge, slanting, slope, edgeName)
     {
         this.startPoint = startPoint;
         this.endPoint = endPoint;
@@ -69,6 +69,7 @@ class Edge2D
         this.intercepts = intercepts;
         this.scanSteps = scanSteps;
         this.nextEdge = nextEdge;
+        this.prevEdge = prevEdge;
         this.slanting = slanting;
         this.slope = slope;
         this.edgeName = edgeName;

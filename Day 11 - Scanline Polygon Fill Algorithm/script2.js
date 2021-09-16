@@ -13,6 +13,56 @@ class ScanLine
     }
 }
 
+function ifBLiesOnSegmentAC(a,b,c)
+{
+    if(b.x <= Math.max(a.x,c.x) 
+    && b.x >= Math.min(a.x,c.x)
+    && b.y <= Math.max(a.y,c.y)
+    && b.y >= Math.min(a.y, c.y))
+   {
+       return true;
+   }
+   else
+       return false;
+}
+
+function getOrientation(a,b,c)
+{
+    var orientation = ["collinear", "clockwise", "anticlockwise"];
+    var val = (b.y - a.y) * (c.x-b.x) - (b.x - a.x)* (c.y - b.y);
+    
+    if(val == 0)
+        return orientation[0];
+    
+    if(val > 0 )
+        return orientation[1];
+    else
+        return orientation[2]
+        
+}
+
+function ifIntersects(a,b,c,d)
+{
+    var o1 = getOrientation(a,b,c);
+    var o2 = getOrientation(a,b,d);
+    var o3 = getOrientation(c,d,a);
+    var o4 = getOrientation(c,d,b);
+    
+    if(o1 != o2 && o3!=o4)
+        return true;
+    
+    if(o1 == 0 && ifBLiesOnSegmentAC(a,c,b))
+        return true;
+    if(o2 == 0 && ifBLiesOnSegmentAC(a,d,b))
+        return true;
+    if(o1 == 0 && ifBLiesOnSegmentAC(c,a,d))
+        return true;
+    if(o1 == 0 && ifBLiesOnSegmentAC(c,b,d))
+        return true;
+    
+    return false;
+}
+
 
 
 function scanlinePolygonFillAlgorithm(polyObject)
@@ -24,12 +74,131 @@ function scanlinePolygonFillAlgorithm(polyObject)
     console.log({polyObject});
     
     var boundaryPoints = findBoundingRect(points);
-    
-    createScanlines(boundaryPoints);
+    var edgeList = populateEdgeProperties(points);
+    console.log('edgeList');
+    console.log({edgeList});
+    return;
+    createScanlines(boundaryPoints, edgeList);
     
 }
 
-function createScanlines(boundaryPoints)
+function populateEdgeProperties(points)
+{
+    var edgeList = [];
+    for(var i = 0; i < points.length - 1; i++)//do for all edges from n = 0 to n = length-1
+    {
+        var edge = new Edge2D();
+        edge.startPoint = new Point2D();
+        edge.startPoint.x = points[i].x;
+        edge.startPoint.y = points[i].y;
+        edge.endPoint = new Point2D();
+        edge.endPoint.x = points[i+1].x
+        edge.endPoint.y = points[i+1].y;
+        
+        edgeList.push(edge);
+    }
+    //now do for the final edge
+    var edge = new Edge2D();
+    edge.startPoint = new Point2D();
+    edge.startPoint.x = points[points.length-1].x;
+    edge.startPoint.y = points[points.length-1].y;
+    edge.endPoint = new Point2D();
+    edge.endPoint.x = points[0].x;
+    edge.endPoint.y = points[0].y;
+    edgeList.push(edge);
+    
+     
+    var alphabetString = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    
+    for(var i = 0; i < edgeList.length; i++)
+    {
+        var edge = edgeList[i];
+        var startX = edge.startPoint.x;
+        var startY = edge.startPoint.y;
+        var endX = edge.endPoint.x;
+        var endY = edge.endPoint.y;
+        
+        edge.yUpper = edge.startPoint.y;
+        if(edge.startPoint.y > edge.endPoint.y )//no need to check for else condition here
+            edge.yUpper = edge.endPoint.y;
+        
+        //next find m (slope) of the line
+        var dy = edge.endPoint.y - edge.startPoint.y;
+        var dx = edge.endPoint.x - edge.startPoint.x;
+        var m = dy/dx;
+        edge.slope = m;
+        
+        if(Math.abs(dy)>Math.abs(dx))
+            edge.slant = "VerticalSlant";
+        else
+            edge.slant = "HorizontalSlant";
+
+        edge.scanSteps = -1;//not used , delete this variable later 
+        
+        var coordinatesList = [];
+        var steps = (Math.abs(dx) > Math.abs(dy) ) ? Math.abs(dx) : Math.abs(dy);
+        const xInc = dx/ parseFloat(steps);
+	const yInc = dy/ parseFloat(steps);
+        
+        let x = startX;
+        let y = startY;
+        
+        for(var j = 0; j <= steps; j++ )
+        {
+            var point = new Point2D();
+            point.x = x;
+            point.y = y;
+            coordinatesList.push(point);
+            x+=xInc;
+            y+=yInc;
+        }
+        edge.intercepts = coordinatesList;
+        edge.nextEdge = null;
+        edge.prevEdge = null;
+        
+        if(i < edgeList.length-1)
+        {
+            var str = ""+ alphabetString[i]+ alphabetString[i+1];
+            edge.edgeName = str;
+        }
+        else
+        {
+            var str = ""+ alphabetString[i] + alphabetString[0];
+            edge.edgeName = str;
+        }
+        
+        if(i > 26)
+            console.err('Polygon edge count > 26, so edgeName value will product error');
+        
+    }
+    var nextEdge = null
+    var prevEdge = null;
+    
+    for(var i = 1; i < edgeList.length - 1; i++)
+    {
+        var edge = edgeList[i];
+        nextEdge = edgeList[i+1];
+        prevEdge = edgeList[i-1];
+        edge.nextEdge = nextEdge;
+        edge.prevEdge = prevEdge;
+    }
+    var edge = edgeList[0];//first edge
+    nextEdge = edgeList[1];
+    prevEdge = edgeList[edgeList.length-1];
+    edge.nextEdge = nextEdge;
+    edge.prevEdge = prevEdge;
+    
+    
+    edge = edgeList[edgeList.length-1];//last edge
+    nextEdge = edgeList[0];
+    prevEdge = edgeList[edgeList.length-2];
+    edge.nextEdge = nextEdge;
+    edge.prevEdge = prevEdge;
+    
+    return edgeList;
+}
+
+function createScanlines(boundaryPoints, edgeList)
 {
     var topMostVertex = new Point2D();
     topMostVertex.x = boundaryPoints[0].x;
@@ -44,7 +213,39 @@ function createScanlines(boundaryPoints)
     drawDDALine(0, bottomMostVertex.y, GcanvasWidth, bottomMostVertex.y);
     setCurrentColor(color[0],color[1],color[2],color[3]);
     
-    
+    var scanlineList = [];
+    var index = 0;
+    for(var i = topMostVertex.y; i < bottomMostVertex.y; i++)
+    {
+        var sline = new ScanLine();
+        sline.index = index;
+        
+        var scanlineSegment = new Line2D();
+        scanlineSegment.x1 = 0;
+        scanlineSegment.y1 = i;
+        scanlineSegment.x2 = GcanvasWidth;
+        scanlineSegment.y2 = i;
+        var scanlineStartPoint = new Point2D();
+        var scanlineEndPoint = new Point2D();
+        scanlineStartPoint.x = scanlineSegment.x1;
+        scanlineStartPoint.y = scanlineSegment.y1;
+        scanlineEndPoint.x = scanlineSegment.x2;
+        scanlineEndPoint.y = scanlineSegment.y2;
+        
+        //now populate all scanline values. for each edge in edgeList check if the scanline intersects with the edge.
+        
+        for(var j = 0; j < edgeList.length; j++)
+        {
+            var edge = edgeList[j];
+            
+            ifIntersects(edge.startPoint, edge.endPoint , scanlineStartPoint, scanlineEndPoint )
+            {
+                //find intersection point and push it in ScanLine objects intersectionList array
+            }
+        }
+        
+        
+    }
 }
 
 
