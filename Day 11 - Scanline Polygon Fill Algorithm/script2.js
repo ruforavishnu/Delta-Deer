@@ -77,7 +77,7 @@ function scanlinePolygonFillAlgorithm(polyObject)
     var edgeList = populateEdgeProperties(points);
     console.log('edgeList');
     console.log({edgeList});
-    return;
+    
     createScanlines(boundaryPoints, edgeList);
     
 }
@@ -129,9 +129,9 @@ function populateEdgeProperties(points)
         edge.slope = m;
         
         if(Math.abs(dy)>Math.abs(dx))
-            edge.slant = "VerticalSlant";
+            edge.slanting = "VerticaSllant";
         else
-            edge.slant = "HorizontalSlant";
+            edge.slanting = "HorizontalSlant";
 
         edge.scanSteps = -1;//not used , delete this variable later 
         
@@ -201,10 +201,10 @@ function populateEdgeProperties(points)
 function createScanlines(boundaryPoints, edgeList)
 {
     var topMostVertex = new Point2D();
-    topMostVertex.x = boundaryPoints[0].x;
+    topMostVertex.x = 0;
     topMostVertex.y = boundaryPoints[0].y;
     var bottomMostVertex = new Point2D();
-    bottomMostVertex.x = boundaryPoints[2].x;
+    bottomMostVertex.x = 0;
     bottomMostVertex.y = boundaryPoints[2].y;
     
     var color = getCurrentColor();
@@ -215,11 +215,14 @@ function createScanlines(boundaryPoints, edgeList)
     
     var scanlineList = [];
     var index = 0;
+    var intersectedPointsList = [];
+    console.log('Starting to calculate scanline intersections ');
     for(var i = topMostVertex.y; i < bottomMostVertex.y; i++)
     {
         var sline = new ScanLine();
         sline.index = index;
-        
+        ++index;
+        intersectedPointsList = [];
         var scanlineSegment = new Line2D();
         scanlineSegment.x1 = 0;
         scanlineSegment.y1 = i;
@@ -241,11 +244,66 @@ function createScanlines(boundaryPoints, edgeList)
             ifIntersects(edge.startPoint, edge.endPoint , scanlineStartPoint, scanlineEndPoint )
             {
                 //find intersection point and push it in ScanLine objects intersectionList array
+                var intersectionPoint = new Point2D();
+                intersectionPoint = getLineSegmentIntersectionPoint(edge.startPoint, edge.endPoint , scanlineStartPoint, scanlineEndPoint );
+                intersectedPointsList.push(intersectionPoint);
             }
         }
+        sline.intersectionList = intersectedPointsList;
+        scanlineList.push(sline);
         
         
     }
+    console.log('Completed calculating scanline intersections ');
+    
+    console.log('Intersection Points List:');
+    console.log({intersectedPointsList});
+    
+    console.log('Scanline List:');
+    console.log({scanlineList});
+}
+
+function getLineSegmentIntersectionPoint(p1,p2, p3, p4)
+{
+    var x1 = p1.x;
+    var y1 = p1.y;
+    var x2 = p2.x;
+    var y2 = p2.y;
+    var x3 = p3.x;
+    var y3 = p3.y;
+    var x4 = p4.x;
+    var y4 = p4.y;
+    
+       
+    var A1 = y2 - y1;
+    var B1 = x1 - x2;
+    var C1 = (A1*x1) + (B1*y1);
+    
+    var A2 = y4-y3;
+    var B2 = x3-x4;
+    var C2 = (A2*x3) + (B2*y3);
+    
+    var det = (A1*B2) - (A2*B1);
+    
+    if(Math.round(det)=== 0)
+    {
+        //lines are parallel
+        console.log('lines are parallel, exiting');
+        return;
+    }
+    else
+    {
+        var x = ((B2 * C1) - (B1*C2))/det;
+        var y = ( (A1*C2) - (A2*C1))/det;
+        
+        var intersectionPoint = new Point2D();
+        intersectionPoint.x = x;
+        intersectionPoint.y = y;
+        console.log('intersection point is:'+ {intersectionPoint});
+        return intersectionPoint;
+    }
+    
+    
 }
 
 
