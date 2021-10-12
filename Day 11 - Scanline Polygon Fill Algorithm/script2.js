@@ -261,6 +261,25 @@ function createScanlines(boundaryPoints, edgeList)
     
     console.log('Scanline List:');
     console.log({scanlineList});
+    
+    for(var k = 0; k < scanlineList.length; k++)
+    {
+        if(k%50 == 0)
+        {   
+            console.log('k mod 25 is equal to true');
+            var intersectionPoints = scanlineList[k].intersectionList;
+            for(var m = 0; m < intersectionPoints.length; m++)
+            {
+                var point = intersectionPoints[m];
+                var strVal = "K"+k+ "_A"+m;
+                
+                markPointAs(point,strVal);
+            }
+            
+        }
+    }
+    
+    
 }
 
 function getLineSegmentIntersectionPoint(p1,p2, p3, p4)

@@ -11,13 +11,6 @@
 <h3>Day 11 - Scanline Polygon Fill Algorithm</h3>
 
 <canvas id="canvas" width="600" height="400"></canvas>
-<div class="program-inputs">
-	
-	<label for="parabola-offset-range">Parallel parabola offset value</label>
-	<input type="range" id="parabola-offset-range" name="parabola-offset-range" min="-100" max="100" step="2">
-	<button class="resetButton" name="resetButton" id="resetButton">Reset</button>
-	
-</div>
 
 <div class="debug-text">
 	
@@ -29,25 +22,6 @@
 <script type="text/javascript" src="script2.js"></script>
 
 <script>
-
-const parabola_offset = document.querySelector("#parabola-offset-range");
-const reset_button = document.querySelector('#resetButton');
-
-parabola_offset.addEventListener('change', ()=> 
-{
-	console.log('parabola offset value changed: '+parabola_offset.value);
-	var offsetValue = parseInt(parabola_offset.value);
-	drawDynamicParabola(offsetValue);
-	
-});
-
-reset_button.addEventListener('click', function(){
-
-
-replaceWithPreviousFrameBuffer();
-
-
-});
 
 </script>
 </body>
