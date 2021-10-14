@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120+150+50+120+20+10 mins
-or 1950 mins
-or 30 hours 50 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120+150+50+120+20+10+20 mins
+or 1970 mins
+or 31 hours 10 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -162,3 +162,10 @@ Commit#27
 Time spent: 10 mins
 
 1. Trying to find out if the value computed as the scan line intersections with each edges are correct.
+
+
+Commit#28
+Time spent: 20 mins
+
+
+1. Still figuring out how to paint/fill the area inside the n-sided polygon. I remember first sitting on this problem on Sep 8. Its been more than a month and I still havent figured out how to fill the insides.

@@ -264,16 +264,28 @@ function createScanlines(boundaryPoints, edgeList)
     
     for(var k = 0; k < scanlineList.length; k++)
     {
-        if(k%50 == 0)
+        if(k%50 == 0 && k>= 1)
         {   
             console.log('k mod 25 is equal to true');
             var intersectionPoints = scanlineList[k].intersectionList;
             for(var m = 0; m < intersectionPoints.length; m++)
             {
+                intersectionPoints = intersectionPoints.sort();
                 var point = intersectionPoints[m];
                 var strVal = "K"+k+ "_A"+m;
                 
                 markPointAs(point,strVal);
+                var col = getCurrentColor();
+                setCurrentColor(255,0,0,255);
+                drawMidpointCircle(point.x, point.y, 5);
+                var onePoint = intersectionPoints[m];
+                
+                if(m > 0)
+                {
+                    var prevPoint = intersectionPoints[m-1];
+                    
+                    drawDDALine(prevPoint.x, prevPoint.y, onePoint.x, onePoint.y);
+                }
             }
             
         }
