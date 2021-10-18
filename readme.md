@@ -1,8 +1,8 @@
 Project Delta Deer - Writing computer graphics algorithms in javascript so that they can be used as a library later on.
 
-Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120+150+50+120+20+10+20 mins
-or 1970 mins
-or 31 hours 10 mins
+Time spent: 30+10+80+335+480+10+30+30+180+60+90+15+60+120+150+50+120+20+10+20+30 mins
+or 2000 mins
+or 31 hours 40 mins
 
 Changes are written in chronological order, so latest commit details are at the end of the file.
 
@@ -169,3 +169,9 @@ Time spent: 20 mins
 
 
 1. Still figuring out how to paint/fill the area inside the n-sided polygon. I remember first sitting on this problem on Sep 8. Its been more than a month and I still havent figured out how to fill the insides.
+
+
+Commit#29
+Time spent: 30 mins
+
+1. Still figuring out.

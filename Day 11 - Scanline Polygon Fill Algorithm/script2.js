@@ -262,34 +262,76 @@ function createScanlines(boundaryPoints, edgeList)
     console.log('Scanline List:');
     console.log({scanlineList});
     
-    for(var k = 0; k < scanlineList.length; k++)
+//    for(var k = 0; k < scanlineList.length; k++)
+//    {
+//        if(k%50 == 0 && k>= 1)
+//        {   
+//            console.log('k mod 25 is equal to true');
+//            var intersectionPoints = scanlineList[k].intersectionList;
+//            for(var m = 0; m < intersectionPoints.length; m++)
+//            {
+//                intersectionPoints = intersectionPoints.sort();
+//                var point = intersectionPoints[m];
+//                var strVal = "K"+k+ "_A"+m;
+//                
+//                markPointAs(point,strVal);
+//                var col = getCurrentColor();
+//                setCurrentColor(255,0,0,255);
+//                drawMidpointCircle(point.x, point.y, 5);
+//                var onePoint = intersectionPoints[m];
+//                
+//                if(m > 0)
+//                {
+//                    var prevPoint = intersectionPoints[m-1];
+//                    
+//                    drawDDALine(prevPoint.x, prevPoint.y, onePoint.x, onePoint.y);
+//                }
+//            }
+//            
+//        }
+//    }
+    
+    ///////////////////
+    var m = 0;
+    var intersectionPoints = scanlineList[m].intersectionList;
+    for(var n = 0; n < intersectionPoints.length; n++)
     {
-        if(k%50 == 0 && k>= 1)
-        {   
-            console.log('k mod 25 is equal to true');
-            var intersectionPoints = scanlineList[k].intersectionList;
-            for(var m = 0; m < intersectionPoints.length; m++)
-            {
-                intersectionPoints = intersectionPoints.sort();
-                var point = intersectionPoints[m];
-                var strVal = "K"+k+ "_A"+m;
-                
-                markPointAs(point,strVal);
-                var col = getCurrentColor();
-                setCurrentColor(255,0,0,255);
-                drawMidpointCircle(point.x, point.y, 5);
-                var onePoint = intersectionPoints[m];
-                
-                if(m > 0)
-                {
-                    var prevPoint = intersectionPoints[m-1];
-                    
-                    drawDDALine(prevPoint.x, prevPoint.y, onePoint.x, onePoint.y);
-                }
-            }
+        //intersectionPoints = intersectionPoints.sort();
+        var point = intersectionPoints[n];
+        
+        
+        var col = getCurrentColor();
+        setCurrentColor(0,0,0,255);
+        //drawMidpointCircle(point.x, point.y, 5);
+        
+        var strVal = "Scanline"+m+ "__SortedPoint"+n;
+        var mPoint = new Point2D();
+        mPoint.x = randX;
+        var randY = point.y + randX;
+        mPoint.y = point.y + 10 + Math.random()*50;;
+        markPointAs(mPoint,strVal);
+        console.log(strVal);
+        if(n>0)
+        {
+            var onePoint = intersectionPoints[n];
+            var prevPoint = intersectionPoints[n-1];            
+            
+            drawDDALine(prevPoint.x, prevPoint.y, onePoint.x, onePoint.y);
+            var rand = 20+ Math.random()*50;
+            console.log('');
+            console.log('circle xcoord:'+(prevPoint.x+rand) );
+            var randX = prevPoint.x+rand;
+            drawMidpointCircle(prevPoint.x+rand, prevPoint.y, 15);
             
         }
+                    
+        
+
+
+        
     }
+    
+    //////////////
     
     
 }
